@@ -39,18 +39,20 @@ This extension uses the following libraries:
 ## Further planned improvements
 
 Following improvements and features are planned to be implamented in future:
-- Prefernces with following options:
-  - English and German translation, currently only display prayer times in Bosnian
-  - All cities provided by [Vaktija.eu](https://vaktija.eu/), currently supports only Graz
-  - All cities provided by [Vaktija.ba](https://vaktija.ba/)
-  - Custom Translations
-  - 12/24 time formats, currently only 24 hour format is supported 
-- Highlight current prayer time and show remaining time until next Prayer
+- [ ] Prefernces with following options:
+  - [ ] English and German translation, currently only display prayer times in Bosnian
+  - [ ] All cities provided by [Vaktija.eu](https://vaktija.eu/), currently supports only Graz
+  - [ ] All cities provided by [Vaktija.ba](https://vaktija.ba/)
+  - [ ] Custom Translations
+  - [ ] 12/24 time formats, currently only 24 hour format is supported 
+- [x] Highlight current prayer time and show remaining time until next Prayer
+- [ ] Add Desktop Background Widget
 
 ## Acknowledgements
 
-This extension is based on the work of [Vaktija.eu](https://vaktija.eu/) and inspired by their website.
+This extension is based on the work of [Vaktija.eu](https://vaktija.eu/) and [Vaktija.ba](https://vaktija.ba/) and inspired by their websites.
 
 ## Contact
 
 For any questions or feedback, please contact the extension author at maid.ascic@student.tugraz.at.
+For any feature request please submit an issue.

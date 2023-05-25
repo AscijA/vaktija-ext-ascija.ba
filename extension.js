@@ -42,12 +42,13 @@ let data = {};
 /**
  * 
  * @param {string} labelText : Content of prayer time item
+ * @param {string} styleClass : CSS Class name
  * @returns PopupMenuItem Containing Prayer time
  */
-function createPrayerTimeItem(labelText) {
+function createPrayerTimeItem(labelText, styleClass = "prayer-item") {
 
     // Create the PopupMenuItem
-    const salahItem = new PopupMenu.PopupMenuItem(labelText, { style_class: "my-element" });
+    const salahItem = new PopupMenu.PopupMenuItem(labelText, { style_class: styleClass });
     salahItem.label_actor.width = 150;
     salahItem.label_actor.x_align = 2;
 
@@ -73,37 +74,67 @@ const Indicator = GObject.registerClass(
         _init() {
             super._init(0.0, _('Vaktija'));
 
+            // Create Panel Icon
             let iconPath = `${Me.path}/vaktija-symbolic.svg`;
             let gicon = Gio.icon_new_for_string(`${iconPath}`);
-
             this.add_child(new St.Icon({
                 gicon: gicon,
                 style_class: 'system-status-icon',
                 icon_size: 16
-
             }));
+
             renderEntries(this.menu);
-
             this.menu.connect("open-state-changed", rerenderPrayerTimes);
-
-
         }
     });
+
+
+
+/**
+ * Finds the index of the current prayer and returns remaining time until individual prayers
+ *
+ * @return {object} index: index of the current prayer, diff: remaining time
+ */
+const findTimeIndex = () => {
+    let index = 0;
+    let retVal = {
+        index: 0,
+        diff: [],
+    };
+    for (const salah in data) {
+        const today = new Date();
+        const date = new Date(`${today.toDateString()} ${data[salah]}`);
+        let diff = Math.round((date - today) / (1000 * 60 * 60));
+        retVal.diff.push(diff);
+        if (today < date) {
+            retVal.index = index;
+
+        }
+        index++;
+    }
+    return retVal;
+};
 
 /**
  *  Updates prayer times, and renders Prayer items
  * @param {PopupMenu} menu: Panel Menu 
  */
 const renderEntries = (menu) => {
-    let title = new PopupMenu.PopupMenuItem('Vaktija', { style_class: "title" });
+    let title = new PopupMenu.PopupMenuItem('Vaktija - Graz', { style_class: "title" });
     title.sensitive = false;
     menu.addMenuItem(title);
     let count = 0;
+    let { index, diff } = findTimeIndex();
     for (const salah in data) {
-        salah.charAt(0).toUpperCase();
-        const salahItem = createPrayerTimeItem(Namazi[count] + data[salah].slice(0, -3));
-        count++;
+
+
+        let style = count == index ? "current" : "prayer-item";
+        let salahItem = createPrayerTimeItem(Namazi[count] + data[salah].slice(0, -3), style);
         menu.addMenuItem(salahItem);
+        salahItem = createPrayerTimeItem(`za ${diff[count]} ${diff[count] >= 5 && diff[count] <= 20 ? "sati" : diff[count] == 1 || diff[count] == 21 ? "sat" : "sata"}`, "next-prayer");
+        menu.addMenuItem(salahItem);
+
+        count++;
     }
 };
 class Extension {
@@ -116,7 +147,6 @@ class Extension {
 
     enable() {
         this._indicator = new Indicator();
-        // data = getVaktijaData();
 
         Main.panel.addToStatusArea(this._uuid, this._indicator);
     }
