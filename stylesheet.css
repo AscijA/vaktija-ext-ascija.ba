@@ -1,0 +1,18 @@
+/* Add your custom extension styling here */
+.my-element {
+  color: #ffffff;
+  text-align: justify;
+  font-family: 'JetBrains Mono';
+
+  border-bottom: #ffffff 1px solid;
+}
+
+
+.title {
+  color: #ffffff;
+  text-align: justify;
+  font-family: 'JetBrains Mono';
+  border: #ffffff 0px solid;
+  border-bottom: #ffffff 2px solid;
+  ;
+}
