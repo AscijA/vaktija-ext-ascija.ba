@@ -18,7 +18,7 @@
 
 /* exported init */
 
-const GETTEXT_DOMAIN = 'my-indicator-extension';
+const GETTEXT_DOMAIN = 'vaktija-extension';
 
 const { GObject, St, Soup, Gio } = imports.gi;
 
@@ -30,13 +30,40 @@ const PopupMenu = imports.ui.popupMenu;
 
 const _ = ExtensionUtils.gettext;
 
-const Namazi = [
-    "Zora:      ",
-    "Iz. Sunca: ",
-    "Podne:     ",
-    "Ikindija:  ",
-    "Aksam:     ",
-    "Jacija:    "];
+// Default Labels for bosnian if labels.json is missing
+let labels = {
+    prayers: [
+        "Zora:      ",
+        "Iz. Sunca: ",
+        "Podne:     ",
+        "Ikindija:  ",
+        "Aksam:     ",
+        "Jacija:    "],
+    prayerNext: "za",
+    prayerPrev: "prije",
+    hour1: "sat",
+    hour2: "sati",
+    hour3: "sata",
+    timeLabelFirstPrev: true,
+    timeLabelFirstNext: true
+
+};
+
+let api = "https://vaktija.eu/graz"
+
+/**
+ * Read translated labels from labels.json
+ * 
+ * @returns Object containing labels 
+ */
+const getLabels = () => {
+    const file = Gio.File.new_for_path(`${Me.path}/translations/labels.json`);
+    const [, contents, etag] = file.load_contents(null);
+    const decoder = new TextDecoder('utf-8');
+    const contentsString = decoder.decode(contents);
+    return JSON.parse(contentsString);
+};
+
 let data = {};
 
 /**
@@ -45,13 +72,13 @@ let data = {};
  * @param {string} styleClass : CSS Class name
  * @returns PopupMenuItem Containing Prayer time
  */
-function createPrayerTimeItem(labelText, styleClass = "prayer-item") {
+const createPrayerTimeItem = (labelText, styleClass = "prayer-item") => {
     // Create the PopupMenuItem 
     const salahItem = new PopupMenu.PopupMenuItem(labelText, { style_class: styleClass });
     salahItem.label_actor.set_width(150);
     salahItem.sensitive = false;
     return salahItem;
-}
+};
 
 /**
  * Updates and rerenders Prayer Times on menu open
@@ -61,7 +88,10 @@ function createPrayerTimeItem(labelText, styleClass = "prayer-item") {
  */
 const rerenderPrayerTimes = (menu, open) => {
     menu.removeAll();
-    if (open) { data = getVaktijaData(); }
+    if (open) {
+        labels = getLabels();
+        data = getVaktijaData();
+    }
     renderEntries(menu);
 };
 
@@ -79,7 +109,7 @@ const findTimeIndex = () => {
     for (const salah in data) {
         const today = new Date();
         const date = new Date(`${today.toDateString()} ${data[salah]}`);
-        let diff = Math.round((date - today) / (1000 * 60 * 60));
+        let diff = (date - today) / (1000 * 60 * 60);
         log(`${today.toISOString()} => ${date.toISOString()}`);
         retVal.diff.push(diff);
         if (today > date) {
@@ -104,22 +134,42 @@ const renderEntries = (menu) => {
 
         // Create prayer item
         let style = count == index ? "current" : "prayer-item";
-        let salahItem = createPrayerTimeItem(Namazi[count] + data[salah].slice(0, -3), style);
+        let salahItem = createPrayerTimeItem(labels.prayers[count] + data[salah].slice(0, -3), style);
         menu.addMenuItem(salahItem);
 
         // create time until/before
         let timeDifference = diff[count];
-        let timePhrase = diff[count] > 0 ? `za ${diff[count]}` : `prije ${-diff[count]}`;
-        let timeUnit = Math.abs(timeDifference) >= 5 && timeDifference <= 20 ? "sati" : (timeDifference == 1 || timeDifference == 21 ? "sat" : "sata");
+
+        // determines which label for prev or next prayer should be shown
+        let beforeAfter = timeDifference > 0 ? labels.prayerNext : labels.prayerPrev;
+
+        // if less than 1 hour, time diff will be displayed in minutes
+        let minOrHour = Math.abs(Math.abs(timeDifference) < 1 ? Math.round(timeDifference * 60) : Math.round(timeDifference));
+
+        // determines if the time unit is minutes or hours, mainly written for bosnian translation
+        timeDifference = Math.abs(Math.round(timeDifference));
+        let timeUnit = timeDifference < 1
+            ? "min"
+            : timeDifference >= 5 && timeDifference <= 20
+                ? labels.hour2
+                : (timeDifference == 1 || (timeDifference == 21 && labels.hour2 != labels.hour3))
+                    ? labels.hour1
+                    : labels.hour3;
+
         style = count == index ? "current-sub" : "next-prayer";
-        salahItem = createPrayerTimeItem(timePhrase + " " + timeUnit, style);
+
+        // determines if the time difference should be printed first
+        let format = beforeAfter == labels.prayerNext ? labels.timeLabelFirstNext : labels.timeLabelFirstPrev;
+        let timePhrase = format ? `${beforeAfter} ${minOrHour} ${timeUnit}` : `${minOrHour} ${timeUnit} ${beforeAfter}`;
+
+        salahItem = createPrayerTimeItem(timePhrase, style);
         menu.addMenuItem(salahItem);
         count++;
     }
 };
 
 /***
- *  Due to the lack of exposed endpoint for prayer times, complete HTML file is loaded
+ *  Due to the lack of exposed endpoint of vaktija.eu for prayer times, complete HTML file is loaded
  * 
  * @returns String: HTML String containing Prayer Times is returned
  */
@@ -128,7 +178,7 @@ const getVaktijaData = () => {
     let session = new Soup.Session();
 
     // Create a new Soup.Message to represent the API request
-    let message = Soup.Message.new('GET', 'https://vaktija.eu/graz');
+    let message = Soup.Message.new('GET', api);
 
     // Send the API request asynchronously
     session.send_message(message);
@@ -171,7 +221,6 @@ class Extension {
 function init(meta) {
     return new Extension(meta.uuid);
 }
-
 
 const Indicator = GObject.registerClass(
     class Indicator extends PanelMenu.Button {
