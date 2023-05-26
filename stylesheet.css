@@ -1,7 +1,6 @@
 /* Add your custom extension styling here */
 .prayer-item {
   color: #ffffff;
-  text-align: justify;
   font-family: 'JetBrains Mono';
   height: 15px;
 }
@@ -9,7 +8,6 @@
 .title {
   height: 15px;
   color: #ffffff;
-  text-align: justify;
   font-family: 'JetBrains Mono';
   border: #ffffff 0px solid;
   border-bottom: #ffffff 2px solid;
@@ -20,7 +18,6 @@
 
 .current {
   color: #00d841;
-  text-align: justify;
   font-family: 'JetBrains Mono';
   font-weight: bold;
   height: 15px;
@@ -29,7 +26,6 @@
 
 .next-prayer {
   color: #ffffff;
-  text-align: justify;
   font-size: 10px;
   height: 12px;
   font-family: 'JetBrains Mono';
@@ -37,7 +33,6 @@
 
 .current-sub {
   color: #ffffff;
-  text-align: justify;
   font-size: 10px;
   height: 12px;
   font-family: 'JetBrains Mono';
