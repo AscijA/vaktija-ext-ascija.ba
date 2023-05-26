@@ -49,7 +49,8 @@ let labels = {
 
 };
 
-let api = "https://vaktija.eu/graz"
+let api = "https://vaktija.eu/graz";
+let timeFormat;
 
 /**
  * Read translated labels from labels.json

@@ -29,11 +29,11 @@ After installing and enabling the extension, a new icon ![Vaktija icon](assets/v
 
 Following improvements and features are planned to be implamented in future:
 - [ ] Prefernces with following options:
-  - [ ] English and German translation, currently only display prayer times in Bosnian
   - [ ] All cities provided by [Vaktija.eu](https://vaktija.eu/), currently supports only Graz
   - [ ] All cities provided by [Vaktija.ba](https://vaktija.ba/)
   - [ ] Other cities in Europe
-  - [ ] Custom Translations
+  - [x] Custom Translations via JSON file
+  - [ ] Guide for Translation JSON file
   - [ ] 12/24 time formats, currently only 24 hour format is supported 
 - [x] Highlight current prayer time and show remaining time until next Prayer
 - [ ] Add Desktop Background Widget
