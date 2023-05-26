@@ -71,7 +71,7 @@ const Indicator = GObject.registerClass(
             super._init(0.0, _('Vaktija'));
 
             // Create Panel Icon
-            let iconPath = `${Me.path}/vaktija-symbolic.svg`;
+            let iconPath = `${Me.path}/assets/vaktija-symbolic.svg`;
             let gicon = Gio.icon_new_for_string(`${iconPath}`);
             this.add_child(new St.Icon({
                 gicon: gicon,
@@ -101,8 +101,9 @@ const findTimeIndex = () => {
         const today = new Date();
         const date = new Date(`${today.toDateString()} ${data[salah]}`);
         let diff = Math.round((date - today) / (1000 * 60 * 60));
+        log(`${today.toISOString()} => ${date.toISOString()}`);
         retVal.diff.push(diff);
-        if (today < date) {
+        if (today > date) {
             retVal.index = index;
         }
         index++;
@@ -121,10 +122,17 @@ const renderEntries = (menu) => {
     let count = 0;
     let { index, diff } = findTimeIndex();
     for (const salah in data) {
+
+        // Create prayer item
         let style = count == index ? "current" : "prayer-item";
         let salahItem = createPrayerTimeItem(Namazi[count] + data[salah].slice(0, -3), style);
         menu.addMenuItem(salahItem);
-        salahItem = createPrayerTimeItem(`za ${diff[count]} ${diff[count] >= 5 && diff[count] <= 20 ? "sati" : diff[count] == 1 || diff[count] == 21 ? "sat" : "sata"}`, "next-prayer");
+
+        // create time until/before
+        let timeDifference = diff[count];
+        let timePhrase = diff[count] > 0 ? `za ${diff[count]}` : `prije ${-diff[count]}`;
+        let timeUnit = Math.abs(timeDifference) >= 5 && timeDifference <= 20 ? "sati" : (timeDifference == 1 || timeDifference == 21 ? "sat" : "sata");
+        salahItem = createPrayerTimeItem(timePhrase + " " + timeUnit, "next-prayer");
         menu.addMenuItem(salahItem);
         count++;
     }
