@@ -65,27 +65,6 @@ const rerenderPrayerTimes = (menu, open) => {
     renderEntries(menu);
 };
 
-const Indicator = GObject.registerClass(
-    class Indicator extends PanelMenu.Button {
-        _init() {
-            super._init(0.0, _('Vaktija'));
-
-            // Create Panel Icon
-            let iconPath = `${Me.path}/assets/vaktija-symbolic.svg`;
-            let gicon = Gio.icon_new_for_string(`${iconPath}`);
-            this.add_child(new St.Icon({
-                gicon: gicon,
-                style_class: 'system-status-icon',
-                icon_size: 16
-            }));
-
-            renderEntries(this.menu);
-            this.menu.connect("open-state-changed", rerenderPrayerTimes);
-        }
-    });
-
-
-
 /**
  * Finds the index of the current prayer and returns remaining time until individual prayers
  *
@@ -138,27 +117,6 @@ const renderEntries = (menu) => {
         count++;
     }
 };
-class Extension {
-    constructor(uuid) {
-        this._uuid = uuid;
-        data = getVaktijaData();
-        ExtensionUtils.initTranslations(GETTEXT_DOMAIN);
-    }
-
-    enable() {
-        this._indicator = new Indicator();
-        Main.panel.addToStatusArea(this._uuid, this._indicator);
-    }
-
-    disable() {
-        this._indicator.destroy();
-        this._indicator = null;
-    }
-}
-
-function init(meta) {
-    return new Extension(meta.uuid);
-}
 
 /***
  *  Due to the lack of exposed endpoint for prayer times, complete HTML file is loaded
@@ -190,3 +148,46 @@ const extractDailyPrayers = (html) => {
     const dailyPrayersData = html.slice(startIndex, endIndex);
     return JSON.parse('{' + dailyPrayersData + '}');
 };
+
+
+class Extension {
+    constructor(uuid) {
+        this._uuid = uuid;
+        data = getVaktijaData();
+        ExtensionUtils.initTranslations(GETTEXT_DOMAIN);
+    }
+
+    enable() {
+        this._indicator = new Indicator();
+        Main.panel.addToStatusArea(this._uuid, this._indicator);
+    }
+
+    disable() {
+        this._indicator.destroy();
+        this._indicator = null;
+    }
+}
+
+function init(meta) {
+    return new Extension(meta.uuid);
+}
+
+
+const Indicator = GObject.registerClass(
+    class Indicator extends PanelMenu.Button {
+        _init() {
+            super._init(0.0, _('Vaktija'));
+
+            // Create Panel Icon
+            let iconPath = `${Me.path}/assets/vaktija-symbolic.svg`;
+            let gicon = Gio.icon_new_for_string(`${iconPath}`);
+            this.add_child(new St.Icon({
+                gicon: gicon,
+                style_class: 'system-status-icon',
+                icon_size: 16
+            }));
+
+            renderEntries(this.menu);
+            this.menu.connect("open-state-changed", rerenderPrayerTimes);
+        }
+    });
