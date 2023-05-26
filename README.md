@@ -21,9 +21,9 @@ This program is licensed under the GNU General Public License version 2.0 or lat
 ## Usage
 
 
-After installing and enabling the extension, a new icon ![Vaktija icon](assets/vaktija-symbolic.png) will appear in the panel. Clicking on the icon will open a menu displaying the daily prayer times.  
-![Vaktija Panel Menu](assets/widget.png)  
+After installing and enabling the extension, a new icon ![Vaktija icon](assets/vaktija-symbolic.png) will appear in the panel. Clicking on the icon will open a menu displaying the daily prayer times. Underneath is shown time before the next prayer and after the previous respectively. Current prayer/time is highlighted.  
 
+![Vaktija Panel Menu](assets/widget.png)  
 ![My desktop example](assets/whole.png)
 
 ## Credits
