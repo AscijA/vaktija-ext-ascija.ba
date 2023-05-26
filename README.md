@@ -56,6 +56,8 @@ Following improvements and features are planned to be implamented in future:
 ## Acknowledgements
 
 This extension is based on the work of [Vaktija.eu](https://vaktija.eu/) and [Vaktija.ba](https://vaktija.ba/) and inspired by their websites.
+Vectors and icons inpired by [SVGRepo](https://www.svgrepo.com/svg/48266/muslim-man-praying).
+
 
 ## Contact
 
