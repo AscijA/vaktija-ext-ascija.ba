@@ -1,0 +1,17 @@
+{
+  "prayers": [
+    "Zora:      ",
+    "Iz. Sunca: ",
+    "Podne:     ",
+    "Ikindija:  ",
+    "Aksam:     ",
+    "Jacija:    "
+  ],
+  "prayerNext": "za",
+  "prayerPrev": "prije",
+  "hour1": "sat",
+  "hour2": "sati",
+  "hour3": "sata",
+  "timeLabelFirstPrev": true,
+  "timeLabelFirstNext": true
+}

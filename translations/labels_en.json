@@ -1,0 +1,17 @@
+{
+  "prayers": [
+    "Fajr:    ",
+    "Sunrise: ",
+    "Dhuhr:   ",
+    "Asr:     ",
+    "Maghrib: ",
+    "Isha:    "
+  ],
+  "prayerNext": "in",
+  "prayerPrev": "ago",
+  "hour1": "hour",
+  "hour2": "hours",
+  "hour3": "hours",
+  "timeLabelFirstPrev": false,
+  "timeLabelFirstNext": true
+}
