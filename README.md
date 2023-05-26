@@ -22,9 +22,10 @@ This program is licensed under the GNU General Public License version 2.0 or lat
 
 
 After installing and enabling the extension, a new icon ![Vaktija icon](assets/vaktija-symbolic.png) will appear in the panel. Clicking on the icon will open a menu displaying the daily prayer times.
+![Vaktija Panel Menu](assets/widget.png)  
 
-![Vaktija Panel Menu](assets/widget.png)
 ![My desktop example](assets/whole.png)
+
 ## Credits
 
 This extension uses the following libraries:
@@ -50,7 +51,7 @@ Following improvements and features are planned to be implamented in future:
   - [ ] 12/24 time formats, currently only 24 hour format is supported 
 - [x] Highlight current prayer time and show remaining time until next Prayer
 - [ ] Add Desktop Background Widget
-- [ ] Add Notifications
+- [ ] Add Notifications X minutes before the prayer
 
 ## Acknowledgements
 
