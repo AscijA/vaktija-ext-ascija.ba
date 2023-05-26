@@ -46,14 +46,10 @@ let data = {};
  * @returns PopupMenuItem Containing Prayer time
  */
 function createPrayerTimeItem(labelText, styleClass = "prayer-item") {
-
-    // Create the PopupMenuItem
+    // Create the PopupMenuItem 
     const salahItem = new PopupMenu.PopupMenuItem(labelText, { style_class: styleClass });
     salahItem.label_actor.width = 150;
-    salahItem.label_actor.x_align = 2;
-
     salahItem.sensitive = false;
-
     return salahItem;
 }
 
@@ -120,7 +116,7 @@ const findTimeIndex = () => {
  * @param {PopupMenu} menu: Panel Menu 
  */
 const renderEntries = (menu) => {
-    let title = new PopupMenu.PopupMenuItem('Vaktija - Graz', { style_class: "title" });
+    let title = new PopupMenu.PopupMenuItem(' Vaktija - Graz', { style_class: "title" });
     title.sensitive = false;
     menu.addMenuItem(title);
     let count = 0;
