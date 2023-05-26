@@ -47,6 +47,7 @@ Following improvements and features are planned to be implamented in future:
   - [ ] 12/24 time formats, currently only 24 hour format is supported 
 - [x] Highlight current prayer time and show remaining time until next Prayer
 - [ ] Add Desktop Background Widget
+- [ ] Add Notifications
 
 ## Acknowledgements
 
@@ -54,5 +55,5 @@ This extension is based on the work of [Vaktija.eu](https://vaktija.eu/) and [Va
 
 ## Contact
 
-For any questions or feedback, please contact the extension author at maid.ascic@student.tugraz.at.
+For any questions or feedback, please contact the extension author at maid.ascic@student.tugraz.at.  
 For any feature request please submit an issue.

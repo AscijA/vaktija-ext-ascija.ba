@@ -104,7 +104,6 @@ const findTimeIndex = () => {
         retVal.diff.push(diff);
         if (today < date) {
             retVal.index = index;
-
         }
         index++;
     }
@@ -122,14 +121,11 @@ const renderEntries = (menu) => {
     let count = 0;
     let { index, diff } = findTimeIndex();
     for (const salah in data) {
-
-
         let style = count == index ? "current" : "prayer-item";
         let salahItem = createPrayerTimeItem(Namazi[count] + data[salah].slice(0, -3), style);
         menu.addMenuItem(salahItem);
         salahItem = createPrayerTimeItem(`za ${diff[count]} ${diff[count] >= 5 && diff[count] <= 20 ? "sati" : diff[count] == 1 || diff[count] == 21 ? "sat" : "sata"}`, "next-prayer");
         menu.addMenuItem(salahItem);
-
         count++;
     }
 };
@@ -137,13 +133,11 @@ class Extension {
     constructor(uuid) {
         this._uuid = uuid;
         data = getVaktijaData();
-
         ExtensionUtils.initTranslations(GETTEXT_DOMAIN);
     }
 
     enable() {
         this._indicator = new Indicator();
-
         Main.panel.addToStatusArea(this._uuid, this._indicator);
     }
 
