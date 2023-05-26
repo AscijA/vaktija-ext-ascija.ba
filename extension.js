@@ -48,7 +48,7 @@ let data = {};
 function createPrayerTimeItem(labelText, styleClass = "prayer-item") {
     // Create the PopupMenuItem 
     const salahItem = new PopupMenu.PopupMenuItem(labelText, { style_class: styleClass });
-    salahItem.label_actor.width = 150;
+    salahItem.label_actor.set_width(150);
     salahItem.sensitive = false;
     return salahItem;
 }
@@ -132,7 +132,8 @@ const renderEntries = (menu) => {
         let timeDifference = diff[count];
         let timePhrase = diff[count] > 0 ? `za ${diff[count]}` : `prije ${-diff[count]}`;
         let timeUnit = Math.abs(timeDifference) >= 5 && timeDifference <= 20 ? "sati" : (timeDifference == 1 || timeDifference == 21 ? "sat" : "sata");
-        salahItem = createPrayerTimeItem(timePhrase + " " + timeUnit, "next-prayer");
+        style = count == index ? "current-sub" : "next-prayer";
+        salahItem = createPrayerTimeItem(timePhrase + " " + timeUnit, style);
         menu.addMenuItem(salahItem);
         count++;
     }
