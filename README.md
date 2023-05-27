@@ -8,7 +8,7 @@ This program is licensed under the GNU General Public License version 2.0 or lat
 
 ## Requirements
 
-- GNOME Shell 42.5
+- GNOME Shell 42
 
 ## Installation
 
@@ -38,7 +38,7 @@ Following improvements and features are planned to be implamented in future:
 - [ ] Add Notifications X minutes before the prayer
 - [x] Custom Translations via JSON file
 - [x] Guide for Translation JSON file
-- [ ] Install script
+- [x] Install script
 
 ## Acknowledgements
 
