@@ -1,14 +1,14 @@
 /* Add your custom extension styling here */
 .prayer-item {
   color: #ffffff;
-  font-family: 'JetBrains Mono';
+  font-family: 'JetBrains Mono', monospace;
   height: 15px;
 }
 
 .title {
   height: 15px;
   color: #ffffff;
-  font-family: 'JetBrains Mono';
+  font-family: 'JetBrains Mono', monospace;
   border: #ffffff 0px solid;
   border-bottom: #ffffff 2px solid;
   /* padding: 0px; */
@@ -18,7 +18,7 @@
 
 .current {
   color: #00d841;
-  font-family: 'JetBrains Mono';
+  font-family: 'JetBrains Mono', monospace;
   font-weight: bold;
   height: 15px;
   background-color: rgba(255, 255, 255, 0.1);
@@ -28,14 +28,14 @@
   color: #ffffff;
   font-size: 10px;
   height: 12px;
-  font-family: 'JetBrains Mono';
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .current-sub {
   color: #ffffff;
   font-size: 10px;
   height: 12px;
-  font-family: 'JetBrains Mono';
+  font-family: 'JetBrains Mono', monospace;
   background-color: rgba(255, 255, 255, 0.1);
 
 }

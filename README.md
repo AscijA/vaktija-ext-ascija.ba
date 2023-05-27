@@ -28,16 +28,17 @@ After installing and enabling the extension, a new icon ![Vaktija icon](assets/v
 ## Further planned improvements
 
 Following improvements and features are planned to be implamented in future:
-- [ ] Prefernces with following options:
+- [ ] Preferences with following options:
   - [ ] All cities provided by [Vaktija.eu](https://vaktija.eu/), currently supports only Graz
   - [ ] All cities provided by [Vaktija.ba](https://vaktija.ba/)
   - [ ] Other cities in Europe
-  - [x] Custom Translations via JSON file
-  - [ ] Guide for Translation JSON file
   - [ ] 12/24 time formats, currently only 24 hour format is supported 
 - [x] Highlight current prayer time and show remaining time until next Prayer
 - [ ] Add Desktop Background Widget
 - [ ] Add Notifications X minutes before the prayer
+- [x] Custom Translations via JSON file
+- [x] Guide for Translation JSON file
+- [ ] Install script
 
 ## Acknowledgements
 
