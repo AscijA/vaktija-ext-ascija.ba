@@ -33,17 +33,17 @@ const _ = ExtensionUtils.gettext;
 // Default Labels for bosnian if labels.json is missing
 let labels = {
     prayers: [
-        "Zora:      ",
-        "Iz. Sunca: ",
-        "Podne:     ",
-        "Ikindija:  ",
-        "Aksam:     ",
-        "Jacija:    "],
-    prayerNext: "za",
-    prayerPrev: "prije",
-    hour1: "sat",
-    hour2: "sati",
-    hour3: "sata",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""],
+    prayerNext: "",
+    prayerPrev: "",
+    hour1: "",
+    hour2: "",
+    hour3: "",
     timeLabelFirstPrev: true,
     timeLabelFirstNext: true
 
@@ -58,11 +58,18 @@ let timeFormat;
  * @returns Object containing labels 
  */
 const getLabels = () => {
-    const file = Gio.File.new_for_path(`${Me.path}/translations/labels.json`);
-    const [, contents, etag] = file.load_contents(null);
-    const decoder = new TextDecoder('utf-8');
-    const contentsString = decoder.decode(contents);
-    return JSON.parse(contentsString);
+
+    try {
+        const file = Gio.File.new_for_path(`${Me.path}/translations/labels.json`);
+        const [, contents, etag] = file.load_contents(null);
+        const decoder = new TextDecoder('utf-8');
+        const contentsString = decoder.decode(contents);
+        const loadedLabels = JSON.parse(contentsString);
+        return loadedLabels;
+    } catch (error) {
+        return labels;
+    }
+
 };
 
 let data = {};
@@ -148,14 +155,17 @@ const renderEntries = (menu) => {
         let minOrHour = Math.abs(Math.abs(timeDifference) < 1 ? Math.round(timeDifference * 60) : Math.round(timeDifference));
 
         // determines if the time unit is minutes or hours, mainly written for bosnian translation
-        timeDifference = Math.abs(Math.round(timeDifference));
+        timeDifference = Math.abs(timeDifference);
         let timeUnit = timeDifference < 1
             ? "min"
-            : timeDifference >= 5 && timeDifference <= 20
+
+            /* START: This part is to be modified if the singular/plural is not shown correctly for your language */
+            : Math.round(timeDifference) >= 5 && Math.round(timeDifference) <= 20
                 ? labels.hour2
-                : (timeDifference == 1 || (timeDifference == 21 && labels.hour2 != labels.hour3))
+                : (Math.round(timeDifference) == 1 || (Math.round(timeDifference) == 21 && labels.hour2 != labels.hour3))
                     ? labels.hour1
                     : labels.hour3;
+        /* END*/
 
         style = count == index ? "current-sub" : "next-prayer";
 
