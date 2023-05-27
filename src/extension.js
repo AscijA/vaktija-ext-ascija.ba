@@ -239,7 +239,7 @@ const Indicator = GObject.registerClass(
             super._init(0.0, _('Vaktija'));
 
             // Create Panel Icon
-            let iconPath = `${Me.path}/assets/vaktija-symbolic.svg`;
+            let iconPath = `${Me.path}/vaktija-symbolic.svg`;
             let gicon = Gio.icon_new_for_string(`${iconPath}`);
             this.add_child(new St.Icon({
                 gicon: gicon,

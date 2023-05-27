@@ -7,7 +7,7 @@ if [ "$UID" = "0" ]; then
     exit 101
 fi
 
-NAME=Vaktija\@ascija.ba
+NAME=vaktija\@ascija.ba
 
 
 function make-local-install {
