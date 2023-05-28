@@ -13,7 +13,7 @@ This program is licensed under the GNU General Public License version 2.0. For m
 ## Installation
 
 1. Clone this repository or download the source code.
-2. Copy the contents to the extensions directory: `~/.local/share/gnome-shell/extensions/vaktija@ascija.ba`.
+2. Run `install.sh`
 3. Restart the GNOME Shell by pressing **Alt+F2** and entering `r` in the prompt, then press **Enter**.
 4. Enable the extension using **GNOME Extensions** or by running `gnome-extensions enable vaktija@ascija.ba` in your terminal .
 
