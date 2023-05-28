@@ -4,7 +4,7 @@ This is a GNOME Shell extension called "Vaktija" that displays daily prayer time
 
 ## License
 
-This program is licensed under the GNU General Public License version 2.0 or later. For more details, please see the [GNU General Public License](http://www.gnu.org/licenses/) page.
+This program is licensed under the GNU General Public License version 2.0. For more details, please see the [GNU General Public License](http://www.gnu.org/licenses/) page.
 
 ## Requirements
 
