@@ -39,3 +39,11 @@
   background-color: rgba(255, 255, 255, 0.1);
 
 }
+
+.background-boxlayout {
+  color: #ffffff;
+  background-color: rgba(10, 10, 10, 0.7);
+  border-radius: 10px;
+  width: 500px;
+  height: 300px;
+}

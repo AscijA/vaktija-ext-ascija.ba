@@ -20,7 +20,7 @@
 
 const GETTEXT_DOMAIN = 'vaktija-extension';
 
-const { GObject, St, Soup, Gio } = imports.gi;
+const { GObject, St, Soup, Gio, Gtk, GLib } = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -118,7 +118,6 @@ const findTimeIndex = () => {
         const today = new Date();
         const date = new Date(`${today.toDateString()} ${data[salah]}`);
         let diff = (date - today) / (1000 * 60 * 60);
-        log(`${today.toISOString()} => ${date.toISOString()}`);
         retVal.diff.push(diff);
         if (today > date) {
             retVal.index = index;
@@ -221,11 +220,18 @@ class Extension {
     enable() {
         this._indicator = new Indicator();
         Main.panel.addToStatusArea(this._uuid, this._indicator);
+        var a = new St.BoxLayout({
+            style_class: "background-boxlayout",
+            pack_start: false,
+            vertical: true,
+        });
+        Main.layoutManager._backgroundGroup.add_child(a);
     }
 
     disable() {
         this._indicator.destroy();
         this._indicator = null;
+
     }
 }
 
