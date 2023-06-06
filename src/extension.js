@@ -30,7 +30,23 @@ const PopupMenu = imports.ui.popupMenu;
 
 const _ = ExtensionUtils.gettext;
 
-// Default Labels for bosnian if labels.json is missing
+/* Style Constants */
+const TITLE_ITEM_STYLE_CLASS = "title";
+
+const DEFAULT_PRAYER_ITEM_STYLE_CLASS = `default-prayer-item`;
+const CURRENT_PRAYER_ITEM_STYLE_CLASS = `current-prayer-item ${DEFAULT_PRAYER_ITEM_STYLE_CLASS}`;
+
+const PRAYER_LABEL_STYLE_CLASS = `prayer-label`;
+const PRAYER_TIME_STYLE_CLASS = `prayer-time`;
+
+const DEFAULT_SUB_ITEM_STYLE_CLASS = `next-prayer`;
+const CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS = `current-sub ${DEFAULT_SUB_ITEM_STYLE_CLASS}`;
+/* --------------- */
+
+/* Other Constants */
+let iconPath = `${Me.path}/vaktija-symbolic.svg`;
+/* --------------- */
+// Default Labels 
 let labels = {
     prayers: [
         "",
@@ -46,11 +62,11 @@ let labels = {
     hour3: "",
     timeLabelFirstPrev: true,
     timeLabelFirstNext: true
-
 };
 
 let api = "https://vaktija.eu/graz";
 let timeFormat;
+let labelsPath = `${Me.path}/translations/labels.json`;
 
 /**
  * Read translated labels from labels.json
@@ -60,7 +76,7 @@ let timeFormat;
 const getLabels = () => {
 
     try {
-        const file = Gio.File.new_for_path(`${Me.path}/translations/labels.json`);
+        const file = Gio.File.new_for_path(labelsPath);
         const [, contents, etag] = file.load_contents(null);
         const decoder = new TextDecoder('utf-8');
         const contentsString = decoder.decode(contents);
@@ -79,12 +95,11 @@ let data = {};
  * @param {string} styleClass : CSS Class name
  * @returns PopupMenuItem Containing Prayer time
  */
-const createSecondaryPrayerItem = (labelText, styleClass = "prayer-item") => {
+const createSecondaryPrayerItem = (labelText, styleClass = DEFAULT_PRAYER_ITEM_STYLE_CLASS) => {
     // Create the PopupMenuItem 
     const salahItem = new PopupMenu.PopupMenuItem(labelText, { style_class: styleClass });
     salahItem.sensitive = false;
     salahItem.setOrnament(PopupMenu.Ornament.HIDDEN);
-
     return salahItem;
 };
 
@@ -95,7 +110,7 @@ const createSecondaryPrayerItem = (labelText, styleClass = "prayer-item") => {
  * @param {string} styleClass : CSS Class name
  * @returns PopupMenuItem Containing Prayer time
  */
-const createPrayerTimeItem = (prayerName, prayerTime, styleClass = "prayer-item") => {
+const createPrayerTimeItem = (prayerName, prayerTime, styleClass = DEFAULT_PRAYER_ITEM_STYLE_CLASS) => {
     // Create the PopupMenuItem 
     const salahItem = new PopupMenu.PopupMenuItem("", {
         style_class: styleClass,
@@ -105,14 +120,14 @@ const createPrayerTimeItem = (prayerName, prayerTime, styleClass = "prayer-item"
     salahItem.sensitive = false;
 
     let prayerNameLabel = new St.Label({
-        style_class: "prayer-label",
+        style_class: PRAYER_LABEL_STYLE_CLASS,
         text: _(prayerName),
         x_expand: true,
         x_align: 1
     });
 
     let prayerTimeLabel = new St.Label({
-        style_class: "prayer-time",
+        style_class: PRAYER_TIME_STYLE_CLASS,
         text: _(prayerTime),
         x_expand: true,
         x_align: 3
@@ -169,8 +184,10 @@ const findTimeIndex = () => {
  * @param {PopupMenu} menu: Panel Menu 
  */
 const renderEntries = (menu) => {
-    let title = new PopupMenu.PopupMenuItem(' Vaktija - Graz', { style_class: "title" });
+    let title = new PopupMenu.PopupMenuItem('Vaktija - Graz', { style_class: TITLE_ITEM_STYLE_CLASS });
     title.sensitive = false;
+    title.label_actor.set_x_expand(true);
+    title.label_actor.set_x_align(2);
     title.setOrnament(PopupMenu.Ornament.HIDDEN);
     menu.addMenuItem(title);
     let count = 0;
@@ -178,7 +195,7 @@ const renderEntries = (menu) => {
     for (const salah in data) {
 
         // Create prayer item
-        let style = count == index ? "current" : "prayer-item";
+        let style = count == index ? CURRENT_PRAYER_ITEM_STYLE_CLASS : DEFAULT_PRAYER_ITEM_STYLE_CLASS;
         let salahItem = createPrayerTimeItem(labels.prayers[count], data[salah].slice(0, -3), style);
         menu.addMenuItem(salahItem);
 
@@ -204,7 +221,7 @@ const renderEntries = (menu) => {
                     : labels.hour3;
         /* END*/
 
-        style = count == index ? "current-sub" : "next-prayer";
+        style = count == index ? CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS : DEFAULT_SUB_ITEM_STYLE_CLASS;
 
         // determines if the time difference should be printed first
         let format = beforeAfter == labels.prayerNext ? labels.timeLabelFirstNext : labels.timeLabelFirstPrev;
@@ -283,8 +300,7 @@ const Indicator = GObject.registerClass(
             super._init(0.0, _('Vaktija'));
 
             // Create Panel Icon
-            let iconPath = `${Me.path}/vaktija-symbolic.svg`;
-            let gicon = Gio.icon_new_for_string(`${iconPath}`);
+            let gicon = Gio.icon_new_for_string(iconPath);
             this.add_child(new St.Icon({
                 gicon: gicon,
                 style_class: 'system-status-icon',
