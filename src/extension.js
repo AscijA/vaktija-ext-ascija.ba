@@ -44,7 +44,7 @@ const CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS = `current-sub ${DEFAULT_SUB_ITEM_STYL
 /* --------------- */
 
 /* Other Constants */
-let iconPath = `${Me.path}/vaktija-symbolic.svg`;
+const iconPath = `${Me.path}/vaktija-symbolic.svg`;
 /* --------------- */
 // Default Labels 
 let labels = {
