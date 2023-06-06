@@ -7,37 +7,20 @@
   border-bottom: #ffffff 2px solid;
   padding-top: 0px;
   padding-bottom: 10px;
-  width: 150px;
+  text-align: center;
 }
 
-.prayer-item {
+/* Main Item */
+.default-prayer-item {
   color: #ffffff;
   font-family: 'JetBrains Mono', monospace;
   height: 15px;
   width: 150px;
 }
 
-.next-prayer {
-  color: #ffffff;
-  font-size: 10px;
-  height: 12px;
-  font-family: 'JetBrains Mono', monospace;
-  width: 150px;
-}
-
-.current {
+.current-prayer-item {
   color: #00d841;
-  font-family: 'JetBrains Mono', monospace;
   font-weight: bold;
-  height: 15px;
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.current-sub {
-  color: #ffffff;
-  font-size: 10px;
-  height: 12px;
-  font-family: 'JetBrains Mono', monospace;
   background-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -48,3 +31,21 @@
 .prayer-time {
   width: 50px;
 }
+/*-----------*/
+
+/* Sub Item */
+.next-prayer {
+  color: #ffffff;
+  font-size: 10px;
+  height: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  width: 150px;
+  padding-left: 19px;
+}
+
+.current-sub {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+/*----------*/
+
+
