@@ -1,19 +1,28 @@
 /* Add your custom extension styling here */
-.prayer-item {
-  color: #ffffff;
-  font-family: 'JetBrains Mono', monospace;
-  height: 15px;
-}
-
 .title {
   height: 15px;
   color: #ffffff;
   font-family: 'JetBrains Mono', monospace;
   border: #ffffff 0px solid;
   border-bottom: #ffffff 2px solid;
-  /* padding: 0px; */
   padding-top: 0px;
   padding-bottom: 10px;
+  width: 150px;
+}
+
+.prayer-item {
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  height: 15px;
+  width: 150px;
+}
+
+.next-prayer {
+  color: #ffffff;
+  font-size: 10px;
+  height: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  width: 150px;
 }
 
 .current {
@@ -24,26 +33,18 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.next-prayer {
-  color: #ffffff;
-  font-size: 10px;
-  height: 12px;
-  font-family: 'JetBrains Mono', monospace;
-}
-
 .current-sub {
   color: #ffffff;
   font-size: 10px;
   height: 12px;
   font-family: 'JetBrains Mono', monospace;
   background-color: rgba(255, 255, 255, 0.1);
-
 }
 
-.background-boxlayout {
-  color: #ffffff;
-  background-color: rgba(10, 10, 10, 0.7);
-  border-radius: 10px;
-  width: 500px;
-  height: 300px;
+.prayer-label {
+  width: 100px;
+}
+
+.prayer-time {
+  width: 50px;
 }

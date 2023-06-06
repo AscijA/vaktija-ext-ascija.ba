@@ -20,7 +20,7 @@
 
 const GETTEXT_DOMAIN = 'vaktija-extension';
 
-const { GObject, St, Soup, Gio, Gtk, GLib } = imports.gi;
+const { GObject, St, Soup, Gio, Gtk, GLib, Clutter } = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -69,7 +69,6 @@ const getLabels = () => {
     } catch (error) {
         return labels;
     }
-
 };
 
 let data = {};
@@ -80,11 +79,49 @@ let data = {};
  * @param {string} styleClass : CSS Class name
  * @returns PopupMenuItem Containing Prayer time
  */
-const createPrayerTimeItem = (labelText, styleClass = "prayer-item") => {
+const createSecondaryPrayerItem = (labelText, styleClass = "prayer-item") => {
     // Create the PopupMenuItem 
     const salahItem = new PopupMenu.PopupMenuItem(labelText, { style_class: styleClass });
-    salahItem.label_actor.set_width(150);
     salahItem.sensitive = false;
+    salahItem.setOrnament(PopupMenu.Ornament.HIDDEN);
+
+    return salahItem;
+};
+
+/**
+ * 
+ * @param {string} prayerName : Name of the prayer
+ * @param {string} prayerTime : Time of the prayer
+ * @param {string} styleClass : CSS Class name
+ * @returns PopupMenuItem Containing Prayer time
+ */
+const createPrayerTimeItem = (prayerName, prayerTime, styleClass = "prayer-item") => {
+    // Create the PopupMenuItem 
+    const salahItem = new PopupMenu.PopupMenuItem("", {
+        style_class: styleClass,
+        hover: false,
+    });
+    salahItem.setOrnament(PopupMenu.Ornament.HIDDEN);
+    salahItem.sensitive = false;
+
+    let prayerNameLabel = new St.Label({
+        style_class: "prayer-label",
+        text: _(prayerName),
+        x_expand: true,
+        x_align: 1
+    });
+
+    let prayerTimeLabel = new St.Label({
+        style_class: "prayer-time",
+        text: _(prayerTime),
+        x_expand: true,
+        x_align: 3
+    });
+
+
+    salahItem.add_actor(prayerNameLabel);
+    salahItem.add_actor(prayerTimeLabel);
+
     return salahItem;
 };
 
@@ -134,6 +171,7 @@ const findTimeIndex = () => {
 const renderEntries = (menu) => {
     let title = new PopupMenu.PopupMenuItem(' Vaktija - Graz', { style_class: "title" });
     title.sensitive = false;
+    title.setOrnament(PopupMenu.Ornament.HIDDEN);
     menu.addMenuItem(title);
     let count = 0;
     let { index, diff } = findTimeIndex();
@@ -141,7 +179,7 @@ const renderEntries = (menu) => {
 
         // Create prayer item
         let style = count == index ? "current" : "prayer-item";
-        let salahItem = createPrayerTimeItem(labels.prayers[count] + data[salah].slice(0, -3), style);
+        let salahItem = createPrayerTimeItem(labels.prayers[count], data[salah].slice(0, -3), style);
         menu.addMenuItem(salahItem);
 
         // create time until/before
@@ -172,7 +210,7 @@ const renderEntries = (menu) => {
         let format = beforeAfter == labels.prayerNext ? labels.timeLabelFirstNext : labels.timeLabelFirstPrev;
         let timePhrase = format ? `${beforeAfter} ${minOrHour} ${timeUnit}` : `${minOrHour} ${timeUnit} ${beforeAfter}`;
 
-        salahItem = createPrayerTimeItem(timePhrase, style);
+        salahItem = createSecondaryPrayerItem(timePhrase, style);
         menu.addMenuItem(salahItem);
         count++;
     }
@@ -220,12 +258,12 @@ class Extension {
     enable() {
         this._indicator = new Indicator();
         Main.panel.addToStatusArea(this._uuid, this._indicator);
-        var a = new St.BoxLayout({
-            style_class: "background-boxlayout",
-            pack_start: false,
-            vertical: true,
-        });
-        Main.layoutManager._backgroundGroup.add_child(a);
+        // let a = new St.BoxLayout({
+        //     style_class: "background-boxlayout",
+        //     pack_start: false,
+        //     vertical: true,
+        // });
+        // Main.layoutManager._backgroundGroup.add_child(a);
     }
 
     disable() {

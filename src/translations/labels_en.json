@@ -1,11 +1,11 @@
 {
   "prayers": [
-    "Fajr:    ",
-    "Sunrise: ",
-    "Dhuhr:   ",
-    "Asr:     ",
-    "Maghrib: ",
-    "Isha:    "
+    "Fajr:",
+    "Sunrise:",
+    "Dhuhr:",
+    "Asr:",
+    "Maghrib:",
+    "Isha:"
   ],
   "prayerNext": "in",
   "prayerPrev": "ago",

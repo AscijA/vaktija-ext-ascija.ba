@@ -11,7 +11,7 @@ Here is given the English translation with explanation of what each of the field
 ```
 {
   "prayers": [                     => Holds the names of the prayers
-    "Fajr:    ",                   => In order to have them properly lined up, please use a monospace font, and have the string equally long
+    "Fajr:    ",                   => In order to have them properly lined up
     "Sunrise: ",
     "Dhuhr:   ",
     "Asr:     ",
