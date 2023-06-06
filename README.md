@@ -52,4 +52,10 @@ Vectors and icons inpired by [SVGRepo](https://www.svgrepo.com/svg/48266/muslim-
 ## Contact
 
 For any questions or feedback, please contact the extension author at maid.ascic@student.tugraz.at.  
-For any feature request please submit an issue.
+For any feature request please submit an issue.  
+
+
+## Notice
+
+This project is following the **Atwood's law** which states: 
+> Any application that can be written in JavaScript, will eventually be written in JavaScript. :rofl: :rofl:
