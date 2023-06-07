@@ -12,6 +12,7 @@
   "hour1": "hour",
   "hour2": "hours",
   "hour3": "hours",
+  "connectionError": "Check Your Internet Connection",
   "timeLabelFirstPrev": false,
   "timeLabelFirstNext": true
 }

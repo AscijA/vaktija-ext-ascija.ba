@@ -12,6 +12,7 @@
   "hour1": "sat",
   "hour2": "sati",
   "hour3": "sata",
+  "connectionError": "Provjerite Internet",
   "timeLabelFirstPrev": true,
   "timeLabelFirstNext": true
 }

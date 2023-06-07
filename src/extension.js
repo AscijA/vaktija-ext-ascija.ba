@@ -31,7 +31,8 @@ const PopupMenu = imports.ui.popupMenu;
 const _ = ExtensionUtils.gettext;
 
 /* Style Constants */
-const TITLE_ITEM_STYLE_CLASS = "title";
+const TITLE_ITEM_STYLE_CLASS = `title`;
+const CONNECTION_ERROR_TITLE_STYLE_CLASS = `${TITLE_ITEM_STYLE_CLASS} con-error`;
 
 const DEFAULT_PRAYER_ITEM_STYLE_CLASS = `default-prayer-item`;
 const CURRENT_PRAYER_ITEM_STYLE_CLASS = `current-prayer-item ${DEFAULT_PRAYER_ITEM_STYLE_CLASS}`;
@@ -60,6 +61,7 @@ let labels = {
     hour1: "",
     hour2: "",
     hour3: "",
+    connectionError: "",
     timeLabelFirstPrev: true,
     timeLabelFirstNext: true
 };
@@ -184,7 +186,13 @@ const findTimeIndex = () => {
  * @param {PopupMenu} menu: Panel Menu 
  */
 const renderEntries = (menu) => {
-    let title = new PopupMenu.PopupMenuItem('Vaktija - Graz', { style_class: TITLE_ITEM_STYLE_CLASS });
+    let titleLabel = "Vaktija - Graz";
+    let titleStyleClass = TITLE_ITEM_STYLE_CLASS;
+    if (data.no1 == "XX:XX") {
+        titleLabel = labels.connectionError;
+        titleStyleClass = CONNECTION_ERROR_TITLE_STYLE_CLASS;
+    }
+    let title = new PopupMenu.PopupMenuItem(titleLabel, { style_class: titleStyleClass });
     title.sensitive = false;
     title.label_actor.set_x_expand(true);
     title.label_actor.set_x_align(2);
@@ -192,6 +200,7 @@ const renderEntries = (menu) => {
     menu.addMenuItem(title);
     let count = 0;
     let { index, diff } = findTimeIndex();
+
     for (const salah in data) {
 
         // Create prayer item
@@ -258,6 +267,9 @@ const getVaktijaData = () => {
  * @returns object: Prayer times object
  */
 const extractDailyPrayers = (html) => {
+    if (html == null) {
+        return { "no1": "XX:XX", "no2": "XX:XX", "no3": "XX:XX", "no4": "XX:XX", "no5": "XX:XX", "no6": "XX:XX" };
+    }
     const startIndex = html.indexOf('"dailyPrayersRes":{') + 19;
     const endIndex = html.indexOf('},"cookiesRes"');
     const dailyPrayersData = html.slice(startIndex, endIndex);
