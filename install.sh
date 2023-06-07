@@ -31,11 +31,18 @@ function usage() {
     echo 'COMMAND:'
     echo "  local-install  install the extension in the user's home directory"
     echo '                 under ~/.local'
+    echo "  dev-install  install the extension in the user's home directory"
+    echo '                 under ~/.local and restart GNOME-Shell'
 }
 
 case "$1" in
     "local-install" )
         make-local-install
+        ;;
+
+    "dev-install" )
+        make-local-install
+        killall -HUP gnome-shell
         ;;
 
     * )
