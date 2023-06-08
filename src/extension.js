@@ -210,13 +210,45 @@ const renderTitle = (menu) => {
  */
 const renderDate = (menu) => {
     const today = new Date();
-    const dateString = today.toLocaleString('bs-Latn-BA', { month: 'short', day: "2-digit" }).toLocaleUpperCase();
+    const dateString = today.toLocaleString('bs-Latn-BA', { month: 'short', day: "2-digit", weekday: "short" }).toLocaleUpperCase();
     const islamic = today.toLocaleString('bs-Latn-BA', { month: 'long', day: "2-digit", calendar: "islamic" }).toLocaleUpperCase();
     const fullString = `${dateString} | ${islamic}`;
     const dates = createSecondaryPrayerItem(fullString, DATE_STYLE_CLASS);
     dates.label_actor.set_x_expand(true);
     dates.label_actor.set_x_align(2);
     menu.addMenuItem(dates);
+};
+
+/**
+ *  Generates how the time phrase of a subitem should contain
+ *
+ * @return {string} timePhrase - Time Phrase to be rendered
+ */
+const generateTimePhrase = (diff) => {
+    let timeDifference = diff;
+
+    // determines which label for prev or next prayer should be shown
+    let beforeAfter = timeDifference > 0 ? labels.prayerNext : labels.prayerPrev;
+
+    // if less than 1 hour, time diff will be displayed in minutes
+    let minOrHour = Math.abs(Math.abs(timeDifference) < 1 ? Math.round(timeDifference * 60) : Math.round(timeDifference));
+
+    // determines if the time unit is minutes or hours, mainly written for bosnian translation
+    timeDifference = Math.abs(timeDifference);
+    let timeUnit = timeDifference < 1
+        ? "min"
+
+        /* START: This part is to be modified if the singular/plural is not shown correctly for your language */
+        : Math.round(timeDifference) >= 5 && Math.round(timeDifference) <= 20
+            ? labels.hour2
+            : (Math.round(timeDifference) == 1 || (Math.round(timeDifference) == 21 && labels.hour2 != labels.hour3))
+                ? labels.hour1
+                : labels.hour3;
+    /* END*/
+    // determines if the time difference should be printed first
+    let format = beforeAfter == labels.prayerNext ? labels.timeLabelFirstNext : labels.timeLabelFirstPrev;
+    let timePhrase = format ? `${beforeAfter} ${minOrHour} ${timeUnit}` : `${minOrHour} ${timeUnit} ${beforeAfter}`;
+    return timePhrase;
 };
 
 /**
@@ -238,7 +270,7 @@ const renderEntries = (menu) => {
         menu.addMenuItem(salahItem);
 
         // create time until/before
-        let timePhrase = generateTimePhrase();
+        let timePhrase = generateTimePhrase(diff[count]);
 
         // Determines if the sub item is current prayer or standard
         style = count == index ? CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS : DEFAULT_SUB_ITEM_STYLE_CLASS;
@@ -248,37 +280,7 @@ const renderEntries = (menu) => {
         count++;
     }
 
-    /**
-     *  Generates how the time phrase of a subitem should contain
-     *
-     * @return {string} timePhrase - Time Phrase to be rendered
-     */
-    const generateTimePhrase = () => {
-        let timeDifference = diff[count];
 
-        // determines which label for prev or next prayer should be shown
-        let beforeAfter = timeDifference > 0 ? labels.prayerNext : labels.prayerPrev;
-
-        // if less than 1 hour, time diff will be displayed in minutes
-        let minOrHour = Math.abs(Math.abs(timeDifference) < 1 ? Math.round(timeDifference * 60) : Math.round(timeDifference));
-
-        // determines if the time unit is minutes or hours, mainly written for bosnian translation
-        timeDifference = Math.abs(timeDifference);
-        let timeUnit = timeDifference < 1
-            ? "min"
-
-            /* START: This part is to be modified if the singular/plural is not shown correctly for your language */
-            : Math.round(timeDifference) >= 5 && Math.round(timeDifference) <= 20
-                ? labels.hour2
-                : (Math.round(timeDifference) == 1 || (Math.round(timeDifference) == 21 && labels.hour2 != labels.hour3))
-                    ? labels.hour1
-                    : labels.hour3;
-        /* END*/
-        // determines if the time difference should be printed first
-        let format = beforeAfter == labels.prayerNext ? labels.timeLabelFirstNext : labels.timeLabelFirstPrev;
-        let timePhrase = format ? `${beforeAfter} ${minOrHour} ${timeUnit}` : `${minOrHour} ${timeUnit} ${beforeAfter}`;
-        return timePhrase;
-    };
 };
 
 /***
