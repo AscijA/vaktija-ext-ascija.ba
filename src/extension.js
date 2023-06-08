@@ -127,14 +127,15 @@ const createPrayerTimeItem = (prayerName, prayerTime, styleClass = DEFAULT_PRAYE
         style_class: PRAYER_LABEL_STYLE_CLASS,
         text: _(prayerName),
         x_expand: true,
-        x_align: 1
+        x_align: Clutter.ActorAlign.START
     });
 
     let prayerTimeLabel = new St.Label({
         style_class: PRAYER_TIME_STYLE_CLASS,
         text: _(prayerTime),
         x_expand: true,
-        x_align: 3
+        x_align: Clutter.ActorAlign.END
+    
     });
 
 
@@ -198,7 +199,7 @@ const renderTitle = (menu) => {
     let title = new PopupMenu.PopupMenuItem(titleLabel, { style_class: titleStyleClass });
     title.sensitive = false;
     title.label_actor.set_x_expand(true);
-    title.label_actor.set_x_align(2);
+    title.label_actor.set_x_align(Clutter.ActorAlign.CENTER);
     title.setOrnament(PopupMenu.Ornament.HIDDEN);
     menu.addMenuItem(title);
 };
@@ -215,7 +216,7 @@ const renderDate = (menu) => {
     const fullString = `${dateString} | ${islamic}`;
     const dates = createSecondaryPrayerItem(fullString, DATE_STYLE_CLASS);
     dates.label_actor.set_x_expand(true);
-    dates.label_actor.set_x_align(2);
+    dates.label_actor.set_x_align(Clutter.ActorAlign.CENTER);
     menu.addMenuItem(dates);
 };
 
@@ -328,12 +329,26 @@ class Extension {
     enable() {
         this._indicator = new Indicator();
         Main.panel.addToStatusArea(this._uuid, this._indicator);
-        // let a = new St.BoxLayout({
-        //     style_class: "background-boxlayout",
+
+        // let stage = new St.BoxLayout({
+        //     style_class: "bg-container",
         //     pack_start: false,
         //     vertical: true,
         // });
-        // Main.layoutManager._backgroundGroup.add_child(a);
+        
+        // stage.set_x(50);
+        // stage.set_y(78);
+
+        // let prayerNameLabel = new St.Label({
+        //     style_class: "title",
+        //     text: _("Vaktija - Graz"),
+        //     x_expand: true,
+        //     x_align: Clutter.ActorAlign.CENTER
+        // });
+
+        // stage.add_actor(prayerNameLabel);
+
+        Main.layoutManager._backgroundGroup.add_child(stage);
     }
 
     disable() {

@@ -1,4 +1,4 @@
-/* Add your custom extension styling here */
+/* title styling*/
 .title {
   height: 15px;
   color: #ffffff;
@@ -14,6 +14,12 @@
   color: #ffffff;
   font-size: 10px;
 }
+
+.con-error {
+  color: red;
+}
+
+/* Title-end */
 
 /* Main Item */
 .default-prayer-item {
@@ -55,6 +61,13 @@
 
 /*----------*/
 
-.con-error {
-  color: red;
+/* Bg element */
+
+.bg-container {
+  background-color: rgba(0, 0, 0, 0.5);
+  height: 600px;
+  width: 300px;
+  border-radius: 10px;
 }
+
+/* -------------*/
