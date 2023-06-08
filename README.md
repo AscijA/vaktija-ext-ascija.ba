@@ -29,7 +29,7 @@ After installing and enabling the extension, a new icon ![Vaktija icon](assets/v
 
 Following improvements and features are planned to be implamented in future:
 - [ ] Preferences with following options:
-  - [ ] All cities provided by [Vaktija.eu](https://vaktija.eu/), currently supports only Graz
+  - [ ] All cities provided by [Vaktija.eu](https://vaktija.eu/), currently supports only Graz, Austria
   - [ ] All cities provided by [Vaktija.ba](https://vaktija.ba/)
   - [ ] Other cities in Europe
   - [ ] 12/24 time formats, currently only 24 hour format is supported 
