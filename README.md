@@ -41,6 +41,7 @@ Following improvements and features are planned to be implamented in future:
 - [x] Install script
 - [x] Add Date and Islamic/Hijri Date and weekday
 - [ ] Move to Notifications/Date & Time
+- [ ] Add significant events on current day as submenu
 
 ## Acknowledgements
 
