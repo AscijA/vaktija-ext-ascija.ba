@@ -238,6 +238,22 @@ const renderEntries = (menu) => {
         menu.addMenuItem(salahItem);
 
         // create time until/before
+        let timePhrase = generateTimePhrase();
+
+        // Determines if the sub item is current prayer or standard
+        style = count == index ? CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS : DEFAULT_SUB_ITEM_STYLE_CLASS;
+
+        salahItem = createSecondaryPrayerItem(timePhrase, style);
+        menu.addMenuItem(salahItem);
+        count++;
+    }
+
+    /**
+     *  Generates how the time phrase of a subitem should contain
+     *
+     * @return {string} timePhrase - Time Phrase to be rendered
+     */
+    const generateTimePhrase = () => {
         let timeDifference = diff[count];
 
         // determines which label for prev or next prayer should be shown
@@ -258,18 +274,11 @@ const renderEntries = (menu) => {
                     ? labels.hour1
                     : labels.hour3;
         /* END*/
-
-        style = count == index ? CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS : DEFAULT_SUB_ITEM_STYLE_CLASS;
-
         // determines if the time difference should be printed first
         let format = beforeAfter == labels.prayerNext ? labels.timeLabelFirstNext : labels.timeLabelFirstPrev;
         let timePhrase = format ? `${beforeAfter} ${minOrHour} ${timeUnit}` : `${minOrHour} ${timeUnit} ${beforeAfter}`;
-
-        salahItem = createSecondaryPrayerItem(timePhrase, style);
-        menu.addMenuItem(salahItem);
-        count++;
-    }
-
+        return timePhrase;
+    };
 };
 
 /***
