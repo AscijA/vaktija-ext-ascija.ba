@@ -3,11 +3,16 @@
   height: 15px;
   color: #ffffff;
   font-family: 'JetBrains Mono', monospace;
+  padding-top: 0px;
+  /* padding-bottom: 10px; */
+}
+
+.date-title {
   border: #ffffff 0px solid;
   border-bottom: #ffffff 2px solid;
-  padding-top: 0px;
-  padding-bottom: 10px;
-  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  color: #ffffff;
+  font-size: 12px;
 }
 
 /* Main Item */
@@ -31,6 +36,7 @@
 .prayer-time {
   width: 50px;
 }
+
 /*-----------*/
 
 /* Sub Item */
@@ -46,8 +52,9 @@
 .current-sub {
   background-color: rgba(255, 255, 255, 0.1);
 }
+
 /*----------*/
 
-.con-error{
+.con-error {
   color: red;
 }

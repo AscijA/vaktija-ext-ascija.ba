@@ -39,8 +39,7 @@ Following improvements and features are planned to be implamented in future:
 - [x] Custom Translations via JSON file
 - [x] Guide for Translation JSON file
 - [x] Install script
-- [ ] Add Date and time
-- [ ] Add Hijri Date
+- [x] Add Date and Islamic/Hijri Date
 - [ ] Move to Notifications/Date & Time
 
 ## Acknowledgements

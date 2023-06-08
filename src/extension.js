@@ -42,6 +42,8 @@ const PRAYER_TIME_STYLE_CLASS = `prayer-time`;
 
 const DEFAULT_SUB_ITEM_STYLE_CLASS = `next-prayer`;
 const CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS = `current-sub ${DEFAULT_SUB_ITEM_STYLE_CLASS}`;
+
+const DATE_STYLE_CLASS = `date-title`;
 /* --------------- */
 
 /* Other Constants */
@@ -181,7 +183,6 @@ const findTimeIndex = () => {
     return retVal;
 };
 
-
 /**
  * Renders title 
  *
@@ -203,15 +204,29 @@ const renderTitle = (menu) => {
 };
 
 /**
+ *  Render current gregorian and islamic date
+ *
+ * @param {*} menu
+ */
+const renderDate = (menu) => {
+    const today = new Date();
+    const dateString = today.toLocaleString('bs-Latn-BA', { month: 'short', day: "2-digit" }).toLocaleUpperCase();
+    const islamic = today.toLocaleString('bs-Latn-BA', { month: 'long', day: "2-digit", calendar: "islamic" }).toLocaleUpperCase();
+    const fullString = `${dateString} | ${islamic}`;
+    const dates = createSecondaryPrayerItem(fullString, DATE_STYLE_CLASS);
+    dates.label_actor.set_x_expand(true);
+    dates.label_actor.set_x_align(2);
+    menu.addMenuItem(dates);
+};
+
+/**
  *  Updates prayer times, and renders Prayer items
  * @param {PopupMenu} menu: Panel Menu 
  */
 const renderEntries = (menu) => {
     renderTitle(menu);
+    renderDate(menu);
 
-    const today = new Date();
-    let a = today.toLocaleDateString("bs-Latn-BA", { dateStyle: "short" });
-    log(a);
     let count = 0;
     let { index, diff } = findTimeIndex();
 
@@ -254,6 +269,7 @@ const renderEntries = (menu) => {
         menu.addMenuItem(salahItem);
         count++;
     }
+
 };
 
 /***
