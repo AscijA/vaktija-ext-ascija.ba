@@ -181,11 +181,13 @@ const findTimeIndex = () => {
     return retVal;
 };
 
+
 /**
- *  Updates prayer times, and renders Prayer items
- * @param {PopupMenu} menu: Panel Menu 
+ * Renders title 
+ *
+ * @param {*} menu
  */
-const renderEntries = (menu) => {
+const renderTitle = (menu) => {
     let titleLabel = "Vaktija - Graz";
     let titleStyleClass = TITLE_ITEM_STYLE_CLASS;
     if (data.no1 == "XX:XX") {
@@ -198,6 +200,18 @@ const renderEntries = (menu) => {
     title.label_actor.set_x_align(2);
     title.setOrnament(PopupMenu.Ornament.HIDDEN);
     menu.addMenuItem(title);
+};
+
+/**
+ *  Updates prayer times, and renders Prayer items
+ * @param {PopupMenu} menu: Panel Menu 
+ */
+const renderEntries = (menu) => {
+    renderTitle(menu);
+
+    const today = new Date();
+    let a = today.toLocaleDateString("bs-Latn-BA", { dateStyle: "short" });
+    log(a);
     let count = 0;
     let { index, diff } = findTimeIndex();
 
