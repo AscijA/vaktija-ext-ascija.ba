@@ -348,7 +348,7 @@ class Extension {
 
         // stage.add_actor(prayerNameLabel);
 
-        Main.layoutManager._backgroundGroup.add_child(stage);
+        // Main.layoutManager._backgroundGroup.add_child(stage);
     }
 
     disable() {
