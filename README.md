@@ -39,7 +39,7 @@ Following improvements and features are planned to be implamented in future:
 - [x] Custom Translations via JSON file
 - [x] Guide for Translation JSON file
 - [x] Install script
-- [x] Add Date and Islamic/Hijri Date and weekday
+- [x] Add Date and Islamic/Hijri Date and weekday, and clock
 - [ ] Move to Notifications/Date & Time
 - [ ] Add significant events on current day as submenu
 
