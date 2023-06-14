@@ -202,7 +202,7 @@ const findTimeIndex = () => {
 /**
  * Renders title 
  *
- * @param {*} menu
+ * @param {PopupMenu} menu: Panel Menu 
  */
 const renderTitle = (menu) => {
     let titleLabel = "Vaktija - Graz";
@@ -222,7 +222,7 @@ const renderTitle = (menu) => {
 /**
  *  Render current gregorian and islamic date
  *
- * @param {*} menu
+ * @param {PopupMenu} menu: Panel Menu 
  */
 const renderDate = (menu) => {
     const dateString = today.toLocaleString('bs-Latn-BA', { month: 'short', day: "2-digit", weekday: "short" }).toLocaleUpperCase();
@@ -236,7 +236,7 @@ const renderDate = (menu) => {
 /**
  * Render border separator
  *
- * @param {*} menu
+ * @param {PopupMenu} menu: Panel Menu 
  */
 const renderSeparator = (menu) => {
     const separatorItem = new PopupMenu.PopupMenuItem("", {
@@ -259,7 +259,7 @@ const renderSeparator = (menu) => {
 /**
  *  Updates the clock and prayer times once every minute
  *
- * @param {*} menu
+ * @param {PopupMenu} menu: Panel Menu 
  * @return {boolean} isEnabled, should the function continue re-executing or not 
  */
 const updateDates = (menu) => {
@@ -310,7 +310,6 @@ const generateTimePhrase = (diff) => {
  */
 const renderEntries = (menu) => {
     renderTitle(menu);
-    // rerendirng frequency
     renderDate(menu);
     renderSeparator(menu);
 
