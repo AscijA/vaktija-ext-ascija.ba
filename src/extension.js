@@ -262,7 +262,6 @@ const updateDates = (menu) => {
     let now = new Date();
 
     if (now.getMinutes() != today.getMinutes()) {
-        log(now.getMinutes() + " : " + today.getMinutes());
         today = now;
         rerenderPrayerTimes(menu, true);
     }
@@ -437,7 +436,7 @@ const Indicator = GObject.registerClass(
                 style_class: 'system-status-icon',
                 icon_size: 16
             }));
-            
+
             renderEntries(this.menu);
             this.menu.connect("open-state-changed", rerenderPrayerTimes);
         }
