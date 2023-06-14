@@ -71,6 +71,10 @@ let labels = {
 let api = "https://vaktija.eu/graz";
 let timeFormat;
 let labelsPath = `${Me.path}/translations/labels.json`;
+let today;
+let isEnabled;
+let dateWidget;
+let data = {};
 
 /**
  * Read translated labels from labels.json
@@ -91,7 +95,6 @@ const getLabels = () => {
     }
 };
 
-let data = {};
 
 /**
  * 
@@ -99,11 +102,19 @@ let data = {};
  * @param {string} styleClass : CSS Class name
  * @returns PopupMenuItem Containing Prayer time
  */
-const createSecondaryPrayerItem = (labelText, styleClass = DEFAULT_PRAYER_ITEM_STYLE_CLASS) => {
+const createSecondaryPrayerItem = (labelText, styleClass = DEFAULT_PRAYER_ITEM_STYLE_CLASS, alignment = Clutter.ActorAlign.START) => {
     // Create the PopupMenuItem 
-    const salahItem = new PopupMenu.PopupMenuItem(labelText, { style_class: styleClass });
+    const salahItem = new PopupMenu.PopupMenuItem("", { style_class: styleClass });
     salahItem.sensitive = false;
     salahItem.setOrnament(PopupMenu.Ornament.HIDDEN);
+
+    let innerLabel = new St.Label({
+        style_class: "",
+        text: _(labelText),
+        x_expand: true,
+        x_align: alignment
+    });
+    salahItem.add_actor(innerLabel);
     return salahItem;
 };
 
@@ -135,7 +146,7 @@ const createPrayerTimeItem = (prayerName, prayerTime, styleClass = DEFAULT_PRAYE
         text: _(prayerTime),
         x_expand: true,
         x_align: Clutter.ActorAlign.END
-    
+
     });
 
 
@@ -210,14 +221,52 @@ const renderTitle = (menu) => {
  * @param {*} menu
  */
 const renderDate = (menu) => {
-    const today = new Date();
     const dateString = today.toLocaleString('bs-Latn-BA', { month: 'short', day: "2-digit", weekday: "short" }).toLocaleUpperCase();
+    const clock = today.toLocaleString('bs-Latn-BA', { hour: "2-digit", minute: "2-digit" }).toLocaleUpperCase();
     const islamic = today.toLocaleString('bs-Latn-BA', { month: 'long', day: "2-digit", calendar: "islamic" }).toLocaleUpperCase();
-    const fullString = `${dateString} | ${islamic}`;
-    const dates = createSecondaryPrayerItem(fullString, DATE_STYLE_CLASS);
-    dates.label_actor.set_x_expand(true);
-    dates.label_actor.set_x_align(Clutter.ActorAlign.CENTER);
-    menu.addMenuItem(dates);
+    const fullString = `${clock} | ${dateString} | ${islamic}`;
+    dateWidget = createSecondaryPrayerItem(fullString, DATE_STYLE_CLASS, Clutter.ActorAlign.CENTER);
+    menu.addMenuItem(dateWidget, 2);
+};
+
+/**
+ * Render border separator
+ *
+ * @param {*} menu
+ */
+const renderSeparator = (menu) => {
+    const separatorItem = new PopupMenu.PopupMenuItem("", {
+        style_class: "outer-separator",
+        hover: false,
+    });
+    separatorItem.setOrnament(PopupMenu.Ornament.HIDDEN);
+    separatorItem.sensitive = false;
+
+    let separatorLabel = new St.Label({
+        style_class: "inner-label outer-separator",
+        x_expand: true,
+        x_align: Clutter.ActorAlign.CENTER,
+        width: dateWidget.get_width() * 0.9
+    });
+    separatorItem.add_actor(separatorLabel);
+    menu.addMenuItem(separatorItem);
+};
+
+/**
+ *  Updates the clock and prayer times once every minute
+ *
+ * @param {*} menu
+ * @return {boolean} isEnabled, should the function continue re-executing or not 
+ */
+const updateDates = (menu) => {
+    let now = new Date();
+
+    if (now.getMinutes() != today.getMinutes()) {
+        log(now.getMinutes() + " : " + today.getMinutes());
+        today = now;
+        rerenderPrayerTimes(menu, true);
+    }
+    return isEnabled;
 };
 
 /**
@@ -258,7 +307,9 @@ const generateTimePhrase = (diff) => {
  */
 const renderEntries = (menu) => {
     renderTitle(menu);
+    // rerendirng frequency
     renderDate(menu);
+    renderSeparator(menu);
 
     let count = 0;
     let { index, diff } = findTimeIndex();
@@ -280,8 +331,6 @@ const renderEntries = (menu) => {
         menu.addMenuItem(salahItem);
         count++;
     }
-
-
 };
 
 /***
@@ -290,16 +339,25 @@ const renderEntries = (menu) => {
  * @returns String: HTML String containing Prayer Times is returned
  */
 const getVaktijaData = () => {
-    // Create a new Soup.Session to handle the API request
-    let session = new Soup.Session();
+    let now = new Date();
+    // if date has not changed return old data, improves resposivness
+    if (now.getDate() != today.getDate() || data != {}) {
 
-    // Create a new Soup.Message to represent the API request
-    let message = Soup.Message.new('GET', api);
+        // Create a new Soup.Session to handle the API request
+        let session = new Soup.Session();
 
-    // Send the API request asynchronously
-    session.send_message(message);
+        // Create a new Soup.Message to represent the API request
+        let message = Soup.Message.new('GET', api);
 
-    return extractDailyPrayers(message["response-body"].data);
+        // Send the API request asynchronously
+        session.send_message(message);
+
+        // Parse the response into data object
+        return extractDailyPrayers(message["response-body"].data);
+
+    } else {
+        return data;
+    }
 };
 
 /***
@@ -322,20 +380,24 @@ const extractDailyPrayers = (html) => {
 class Extension {
     constructor(uuid) {
         this._uuid = uuid;
-        data = getVaktijaData();
         ExtensionUtils.initTranslations(GETTEXT_DOMAIN);
     }
-
     enable() {
+        log("Vaktija: Enable");
+        today = new Date();
+        data = getVaktijaData();
+        isEnabled = true;
         this._indicator = new Indicator();
-        Main.panel.addToStatusArea(this._uuid, this._indicator);
 
+        GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 1, () => { return updateDates(this._indicator.menu); });
+
+        Main.panel.addToStatusArea(this._uuid, this._indicator);
         // let stage = new St.BoxLayout({
         //     style_class: "bg-container",
         //     pack_start: false,
         //     vertical: true,
         // });
-        
+
         // stage.set_x(50);
         // stage.set_y(78);
 
@@ -352,9 +414,10 @@ class Extension {
     }
 
     disable() {
+        log("Vaktija: Disable");
         this._indicator.destroy();
         this._indicator = null;
-
+        isEnabled = false;
     }
 }
 
@@ -374,7 +437,7 @@ const Indicator = GObject.registerClass(
                 style_class: 'system-status-icon',
                 icon_size: 16
             }));
-
+            
             renderEntries(this.menu);
             this.menu.connect("open-state-changed", rerenderPrayerTimes);
         }

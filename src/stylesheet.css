@@ -1,15 +1,12 @@
-/* title styling*/
+/* title styling */
 .title {
   height: 15px;
   color: #ffffff;
   font-family: 'JetBrains Mono', monospace;
   padding-top: 0px;
-  /* padding-bottom: 10px; */
 }
 
 .date-title {
-  border: #ffffff 0px solid;
-  border-bottom: #ffffff 2px solid;
   font-family: 'JetBrains Mono', monospace;
   color: #ffffff;
   font-size: 10px;
@@ -26,7 +23,7 @@
   color: #ffffff;
   font-family: 'JetBrains Mono', monospace;
   height: 15px;
-  width: 150px;
+  width: 250px;
 }
 
 .current-prayer-item {
@@ -36,12 +33,12 @@
 }
 
 .prayer-label {
-  width: 100px;
+  width: 150px;
 }
 
-.prayer-time {
-  width: 50px;
-}
+/* .prayer-time {
+  width: 50px; 
+} */
 
 /*-----------*/
 
@@ -51,8 +48,8 @@
   font-size: 10px;
   height: 12px;
   font-family: 'JetBrains Mono', monospace;
-  width: 150px;
-  padding-left: 19px;
+  width: 250px;
+  /* padding-left: 19px; */
 }
 
 .current-sub {
@@ -61,6 +58,19 @@
 
 /*----------*/
 
+/* Separator */
+.outer-separator {
+  font-size: 0px;
+  height: 0px;
+  padding: 0px;
+}
+
+.inner-label {
+  border: #ffffff 0px solid;
+  border-bottom: #ffffff 2px solid;
+}
+
+/* --------- */
 /* Bg element */
 
 .bg-container {
@@ -70,4 +80,4 @@
   border-radius: 10px;
 }
 
-/* -------------*/
+/* ---------- */
