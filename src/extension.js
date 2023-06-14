@@ -34,6 +34,11 @@ const _ = ExtensionUtils.gettext;
 const TITLE_ITEM_STYLE_CLASS = `title`;
 const CONNECTION_ERROR_TITLE_STYLE_CLASS = `${TITLE_ITEM_STYLE_CLASS} con-error`;
 
+const DATE_STYLE_CLASS = `date-title`;
+
+const OUTER_SEPARATOR_STYLE_CLASS = `outer-separator`;
+const INNER_LABEL_STYLE_CLASS = `inner-label ${OUTER_SEPARATOR_STYLE_CLASS}`;
+
 const DEFAULT_PRAYER_ITEM_STYLE_CLASS = `default-prayer-item`;
 const CURRENT_PRAYER_ITEM_STYLE_CLASS = `current-prayer-item ${DEFAULT_PRAYER_ITEM_STYLE_CLASS}`;
 
@@ -43,7 +48,6 @@ const PRAYER_TIME_STYLE_CLASS = `prayer-time`;
 const DEFAULT_SUB_ITEM_STYLE_CLASS = `next-prayer`;
 const CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS = `current-sub ${DEFAULT_SUB_ITEM_STYLE_CLASS}`;
 
-const DATE_STYLE_CLASS = `date-title`;
 /* --------------- */
 
 /* Other Constants */
@@ -236,14 +240,14 @@ const renderDate = (menu) => {
  */
 const renderSeparator = (menu) => {
     const separatorItem = new PopupMenu.PopupMenuItem("", {
-        style_class: "outer-separator",
+        style_class: OUTER_SEPARATOR_STYLE_CLASS,
         hover: false,
     });
     separatorItem.setOrnament(PopupMenu.Ornament.HIDDEN);
     separatorItem.sensitive = false;
 
     let separatorLabel = new St.Label({
-        style_class: "inner-label outer-separator",
+        style_class: INNER_LABEL_STYLE_CLASS,
         x_expand: true,
         x_align: Clutter.ActorAlign.CENTER,
         width: dateWidget.get_width() * 0.9
@@ -385,6 +389,7 @@ class Extension {
         log("Vaktija: Enable");
         today = new Date();
         data = getVaktijaData();
+
         isEnabled = true;
         this._indicator = new Indicator();
 
