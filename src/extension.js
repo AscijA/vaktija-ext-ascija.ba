@@ -220,6 +220,7 @@ const findTimeIndex = () => {
 const renderTitle = (menu) => {
     const clock = today.toLocaleString('bs-Latn-BA', { hour: "2-digit", minute: "2-digit" }).toLocaleUpperCase();
     let titleLabel = `Vaktija - Graz   |   ${clock}`;
+    
     let titleStyleClass = TITLE_ITEM_STYLE_CLASS;
     if (data.no1 == "XX:XX") {
         titleLabel = labels.connectionError;
@@ -277,7 +278,6 @@ const updateDates = (menu) => {
     let now = new Date();
     // update for clocks and dates
     if (now.getMinutes() != today.getMinutes()) {
-        log(now.getDate() + " " + today.getDate());
         if (now.getDate() != today.getDate()) {
             dateLabelBg.set_text(generateDateString());
         }
@@ -551,7 +551,6 @@ const Indicator = GObject.registerClass(
     class Indicator extends PanelMenu.Button {
         _init() {
             super._init(0.0, _('Vaktija'));
-
             // Create Panel Icon
             let gicon = Gio.icon_new_for_string(iconPath);
             this.add_child(new St.Icon({

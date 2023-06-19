@@ -10,6 +10,11 @@ This program is licensed under the GNU General Public License version 2.0. For m
 
 - GNOME Shell 42
 
+## Optional
+- [Poppins Font](https://fonts.google.com/specimen/Poppins)
+- GNOME Shell Theme [Qogir-dark](https://www.gnome-look.org/p/1230631/)  
+*Currently works best with Qogir-dark, which is the theme used in development. Works with most of the dark themes. Light themes need some adaptation in the `stylesheet.css`*
+  
 ## Installation
 
 1. Clone this repository or download the source code.
@@ -23,7 +28,7 @@ After installing and enabling the extension, a new icon ![Vaktija icon](assets/v
 
 ![Vaktija Panel Menu](assets/widget.png)  
 ![My desktop example](assets/whole.png)
-
+*Font used in the screenshots is Poppins, and is as such as default in the stylesheet. GNOME Shell theme used is Qogir-dark ([see Optional](#optional))*
 
 ## Further planned improvements
 
@@ -33,14 +38,14 @@ Following improvements and features are planned to be implamented in future:
   - [ ] All cities provided by [Vaktija.ba](https://vaktija.ba/)
   - [ ] Other cities in Europe
   - [ ] 12/24 time formats, currently only 24 hour format is supported 
+  - [ ] Light Theme
 - [x] Highlight current prayer time and show remaining time until next Prayer
-- [ ] Add Desktop Background Widget
+- [x] Add Desktop Background Widget
 - [ ] Add Notifications X minutes before the prayer
 - [x] Custom Translations via JSON file
 - [x] Guide for Translation JSON file
 - [x] Install script
 - [x] Add Date and Islamic/Hijri Date and weekday, and clock
-- [ ] Move to Notifications/Date & Time
 - [ ] Add significant events on current day as submenu
 
 ## Acknowledgements

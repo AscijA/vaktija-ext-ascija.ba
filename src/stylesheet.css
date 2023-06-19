@@ -1,24 +1,22 @@
 /* title styling */
 .title {
-  height: 15px;
+  font-size: 15px;
   color: #ffffff;
-  /* font-family: 'JetBrains Mono', monospace; */
   font-family: "Poppins", sans-serif;
   font-weight: 500;
   padding-top: 0px;
-  margin-right: 3px;
+  /* margin-right: 3px; */
   /* padding-left: 0; */
 
 }
 
 .date-title {
-  /* font-family: 'JetBrains Mono', monospace; */
   font-family: "Poppins", sans-serif;
   font-weight: 500;
   color: #ffffff;
   font-size: 12px;
-  margin-left: 4px;
-  padding-left: 0;
+  /* margin-left: 4px; */
+  /* padding-left: 0; */
 }
 
 .con-error {
@@ -32,23 +30,19 @@
   color: #ffffff;
   font-family: "Poppins", sans-serif;
   font-weight: 500;
-
-  padding-left: 0;
-  padding-right: 6px;
-  height: 15px;
 }
 
 .current-prayer-item {
   color: #00d841;
   font-weight: bold;
-  background-color: rgba(255, 255, 255, 0.1);
+  /* background-color: rgba(255, 255, 255, 0.1); */
 
-  padding-left: 0;
+  /* padding-left: 0; */
 }
 
 .prayer-label {
   width: 100px;
-  padding-left: 0;
+  /* padding-left: 0; */
 }
 
 /* .prayer-time { */
@@ -62,16 +56,15 @@
   color: #ffffff;
   font-size: 10px;
   height: 12px;
-  /* font-family: 'JetBrains Mono', monospace; */
   font-family: "Poppins", sans-serif;
   font-weight: 500;
-  padding-left: 0;
+  /* padding-left: 0; */
 
 }
 
-.current-sub {
+/* .current-sub {
   background-color: rgba(255, 255, 255, 0.1);
-}
+} */
 
 /*----------*/
 
@@ -80,14 +73,12 @@
   font-size: 0px;
   height: 0px;
   padding: 0px;
-
-  padding-left: 0;
-  margin-right: 3px;
+  /* padding-left: 0; */
+  /* margin-right: 3px; */
 }
 
 .inner-label {
-
-  padding-left: 0;
+  /* padding-left: 0; */
   border: #ffffff 0px solid;
   border-bottom: #ffffff 2px solid;
 }
@@ -98,26 +89,18 @@
 /* Bg element */
 
 .bg-container {
-  /* width: 300px; */
   border-radius: 10px;
 }
 
 .bg-title {
   font-size: 24px;
-  /* font-family: 'JetBrains Mono', monospace; */
   font-family: "Poppins", sans-serif;
   font-weight: 500;
-
-  /* margin-top: 8px; */
-  /* border: #ffffff 0px solid; */
-  /* border-top: #ffffff 2px solid; */
 }
 
 .bg-item-main {
-  /* font-family: 'JetBrains Mono', monospace; */
   font-family: "Poppins", sans-serif;
   font-weight: 500;
-
   font-size: 20px;
   margin-left: 16px;
   margin-right: 16px;
@@ -126,10 +109,8 @@
 
 .bg-item-sub {
   font-size: 15px;
-  /* font-family: 'JetBrains Mono', monospace; */
   font-family: "Poppins", sans-serif;
   font-weight: 500;
-
   margin-left: 16px;
   margin-bottom: 8px;
   margin-right: 16px;
@@ -142,19 +123,15 @@
 
 .bg-clock {
   font-size: 32px;
-  /* font-family: 'JetBrains Mono', monospace; */
   font-family: "Poppins", sans-serif;
   font-weight: 500;
-
   margin-top: 8px;
 
 }
 
 .bg-date {
-  /* font-family: 'JetBrains Mono', monospace; */
   font-family: "Poppins", sans-serif;
   font-weight: 500;
-
   margin-bottom: 8px;
 }
 
@@ -171,6 +148,3 @@
 }
 
 /* --------- */
-
-
-/* ---------- */
