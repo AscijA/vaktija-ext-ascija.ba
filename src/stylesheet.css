@@ -2,14 +2,23 @@
 .title {
   height: 15px;
   color: #ffffff;
-  font-family: 'JetBrains Mono', monospace;
+  /* font-family: 'JetBrains Mono', monospace; */
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
   padding-top: 0px;
+  margin-right: 3px;
+  /* padding-left: 0; */
+
 }
 
 .date-title {
-  font-family: 'JetBrains Mono', monospace;
+  /* font-family: 'JetBrains Mono', monospace; */
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
   color: #ffffff;
-  font-size: 10px;
+  font-size: 12px;
+  margin-left: 4px;
+  padding-left: 0;
 }
 
 .con-error {
@@ -21,25 +30,31 @@
 /* Main Item */
 .default-prayer-item {
   color: #ffffff;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+
+  padding-left: 0;
+  padding-right: 6px;
   height: 15px;
-  width: 250px;
 }
 
 .current-prayer-item {
   color: #00d841;
   font-weight: bold;
   background-color: rgba(255, 255, 255, 0.1);
+
+  padding-left: 0;
 }
 
 .prayer-label {
-  width: 150px;
+  width: 100px;
+  padding-left: 0;
 }
 
-/* .prayer-time {
-  width: 50px; 
-} */
-
+/* .prayer-time { */
+/* width: 50px;  */
+/* background-color: red; */
+/* } */
 /*-----------*/
 
 /* Sub Item */
@@ -47,9 +62,11 @@
   color: #ffffff;
   font-size: 10px;
   height: 12px;
-  font-family: 'JetBrains Mono', monospace;
-  width: 250px;
-  /* padding-left: 19px; */
+  /* font-family: 'JetBrains Mono', monospace; */
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  padding-left: 0;
+
 }
 
 .current-sub {
@@ -63,21 +80,97 @@
   font-size: 0px;
   height: 0px;
   padding: 0px;
+
+  padding-left: 0;
+  margin-right: 3px;
 }
 
 .inner-label {
+
+  padding-left: 0;
   border: #ffffff 0px solid;
   border-bottom: #ffffff 2px solid;
 }
 
 /* --------- */
+
+
 /* Bg element */
 
 .bg-container {
-  background-color: rgba(0, 0, 0, 0.5);
-  height: 600px;
-  width: 300px;
+  /* width: 300px; */
   border-radius: 10px;
 }
+
+.bg-title {
+  font-size: 24px;
+  /* font-family: 'JetBrains Mono', monospace; */
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+
+  /* margin-top: 8px; */
+  /* border: #ffffff 0px solid; */
+  /* border-top: #ffffff 2px solid; */
+}
+
+.bg-item-main {
+  /* font-family: 'JetBrains Mono', monospace; */
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+
+  font-size: 20px;
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-top: 8px;
+}
+
+.bg-item-sub {
+  font-size: 15px;
+  /* font-family: 'JetBrains Mono', monospace; */
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+
+  margin-left: 16px;
+  margin-bottom: 8px;
+  margin-right: 16px;
+}
+
+.bg-item-current {
+  color: #00d841;
+  font-weight: bold;
+}
+
+.bg-clock {
+  font-size: 32px;
+  /* font-family: 'JetBrains Mono', monospace; */
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+
+  margin-top: 8px;
+
+}
+
+.bg-date {
+  /* font-family: 'JetBrains Mono', monospace; */
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+
+  margin-bottom: 8px;
+}
+
+/* BG Separator */
+.bg-outer-separator {
+  font-size: 0px;
+  height: 0px;
+  padding: 0px;
+}
+
+.bg-inner-label {
+  border: #ffffff 0px solid;
+  border-bottom: #ffffff 2px solid;
+}
+
+/* --------- */
+
 
 /* ---------- */
