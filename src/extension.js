@@ -86,8 +86,9 @@ let labels = {
     timeLabelFirstNext: true
 };
 
-let api = "https://vaktija.eu/graz";
-let timeFormat;
+let defaultCity = `graz`;
+let vaktijaEUAPI = `https://vaktija.eu/`;
+// let timeFormat;
 let labelsPath = `${Me.path}/translations/labels.json`;
 let today;
 let isEnabled;
@@ -96,6 +97,7 @@ let data = {};
 let stage;
 let dateLabelBg;
 let clockLabelBg;
+let salahItemsContainer;
 
 /**
  * Read translated labels from labels.json
@@ -121,7 +123,7 @@ const getLabels = () => {
  * @param {string} styleClass : CSS Class name
  * @returns PopupMenuItem Containing Prayer time
  */
-const createSecondaryPrayerItem = (labelText, styleClass = DEFAULT_PRAYER_ITEM_STYLE_CLASS, alignment = Clutter.ActorAlign.START) => {
+const createWidgetSecondaryPrayerItem = (labelText, styleClass = DEFAULT_PRAYER_ITEM_STYLE_CLASS, alignment = Clutter.ActorAlign.START) => {
     // Create the PopupMenuItem 
     const salahItem = new PopupMenu.PopupMenuItem("", { style_class: styleClass });
     salahItem.sensitive = false;
@@ -144,7 +146,7 @@ const createSecondaryPrayerItem = (labelText, styleClass = DEFAULT_PRAYER_ITEM_S
  * @param {string} styleClass : CSS Class name
  * @returns PopupMenuItem Containing Prayer time
  */
-const createPrayerTimeItem = (prayerName, prayerTime, styleClass = DEFAULT_PRAYER_ITEM_STYLE_CLASS) => {
+const createWidgetPrayerTimeItem = (prayerName, prayerTime, styleClass = DEFAULT_PRAYER_ITEM_STYLE_CLASS) => {
     // Create the PopupMenuItem 
     const salahItem = new PopupMenu.PopupMenuItem("", {
         style_class: styleClass,
@@ -179,13 +181,13 @@ const createPrayerTimeItem = (prayerName, prayerTime, styleClass = DEFAULT_PRAYE
  * @param {PopupMenu.PopupBaseMenu} menu The emitting object
  * @param {boolean} open True if the menu is open, false if closed
  */
-const rerenderPrayerTimes = (menu, open) => {
+const rerenderWidgetPrayerTimes = (menu, open) => {
     menu.removeAll();
     if (open) {
         labels = getLabels();
         data = getVaktijaData();
     }
-    renderEntries(menu);
+    renderWidgetEntries(menu);
 };
 
 /**
@@ -217,20 +219,22 @@ const findTimeIndex = () => {
  *
  * @param {PopupMenu} menu: Panel Menu 
  */
-const renderTitle = (menu) => {
+const renderWidgetTitle = (menu) => {
     const clock = today.toLocaleString('bs-Latn-BA', { hour: "2-digit", minute: "2-digit" }).toLocaleUpperCase();
-    let titleLabel = `Vaktija - Graz   |   ${clock}`;
-    
+    let city = defaultCity.charAt(0).toUpperCase() + defaultCity.slice(1);
+    let titleLabel = `Vaktija - ${city}   |   ${clock}`;
+
     let titleStyleClass = TITLE_ITEM_STYLE_CLASS;
     if (data.no1 == "XX:XX") {
         titleLabel = labels.connectionError;
         titleStyleClass = CONNECTION_ERROR_TITLE_STYLE_CLASS;
     }
-    let title = new PopupMenu.PopupMenuItem(titleLabel, { style_class: titleStyleClass });
-    title.sensitive = false;
-    title.label_actor.set_x_expand(true);
-    title.label_actor.set_x_align(Clutter.ActorAlign.CENTER);
-    title.setOrnament(PopupMenu.Ornament.HIDDEN);
+    let title = createWidgetSecondaryPrayerItem(titleLabel, titleStyleClass, Clutter.ActorAlign.CENTER);
+    // new PopupMenu.PopupMenuItem(titleLabel, { style_class: titleStyleClass });
+    // title.sensitive = false;
+    // title.label_actor.set_x_expand(true);
+    // title.label_actor.set_x_align(Clutter.ActorAlign.CENTER);
+    // title.setOrnament(PopupMenu.Ornament.HIDDEN);
     menu.addMenuItem(title);
 };
 
@@ -239,9 +243,9 @@ const renderTitle = (menu) => {
  *
  * @param {PopupMenu} menu: Panel Menu 
  */
-const renderDate = (menu) => {
+const renderWidgetDate = (menu) => {
     const fullString = generateDateString();
-    dateWidget = createSecondaryPrayerItem(fullString, DATE_STYLE_CLASS, Clutter.ActorAlign.CENTER);
+    dateWidget = createWidgetSecondaryPrayerItem(fullString, DATE_STYLE_CLASS, Clutter.ActorAlign.CENTER);
     menu.addMenuItem(dateWidget, 2);
 };
 
@@ -250,7 +254,7 @@ const renderDate = (menu) => {
  *
  * @param {PopupMenu} menu: Panel Menu 
  */
-const renderSeparator = (menu) => {
+const renderWidgetSeparator = (menu) => {
     const separatorItem = new PopupMenu.PopupMenuItem("", {
         style_class: OUTER_SEPARATOR_STYLE_CLASS,
         hover: false,
@@ -276,17 +280,32 @@ const renderSeparator = (menu) => {
  */
 const updateDates = (menu) => {
     let now = new Date();
+    const settings = ExtensionUtils.getSettings();
+    let city = settings.get_string('vaktija-eu-city').toLowerCase();
     // update for clocks and dates
-    if (now.getMinutes() != today.getMinutes()) {
-        if (now.getDate() != today.getDate()) {
-            dateLabelBg.set_text(generateDateString());
-        }
+    if (now.getMinutes() != today.getMinutes() || city != defaultCity) {
         today = now;
-        const clock = today.toLocaleString('bs-Latn-BA', { hour: "2-digit", minute: "2-digit" }).toLocaleUpperCase();
-        clockLabelBg.set_text(clock);
+        defaultCity = city;
 
-        rerenderPrayerTimes(menu, true);
+        const settings = ExtensionUtils.getSettings();
+        let isBGWidgetEnabled = settings.get_boolean('use-bg-widget');
+        if (isBGWidgetEnabled) {
+            stage.destroy();
+            let posY = parseInt(settings.get_string('bg-widget-y-pos'));
+            let posX = parseInt(settings.get_string("bg-widget-x-pos"));
+            renderBGPrayerTimesWidget(posX, posY);
+            // const clock = today.toLocaleString('bs-Latn-BA', { hour: "2-digit", minute: "2-digit" }).toLocaleUpperCase();
+            // clockLabelBg.set_text(clock);
+
+            // if (now.getDate() != today.getDate() || city != defaultCity) {
+            //     dateLabelBg.set_text(generateDateString());
+            // }
+
+        }
+        rerenderWidgetPrayerTimes(menu, true);
     }
+
+
     return isEnabled;
 };
 
@@ -328,8 +347,8 @@ const generateTimePhrase = (diff) => {
  * @returns {string} fullString : Returns Date string to be printed
  */
 const generateDateString = () => {
-    const dateString = today.toLocaleString('bs-Latn-BA', { month: 'short', day: "2-digit", weekday: "short" }).toLocaleUpperCase();
-    const islamic = today.toLocaleString('bs-Latn-BA', { month: 'long', day: "2-digit", calendar: "islamic" }).toLocaleUpperCase();
+    const dateString = today.toLocaleString('en', { month: 'short', day: "2-digit", weekday: "short" }).toLocaleUpperCase();
+    const islamic = today.toLocaleString('en', { month: 'long', day: "2-digit", calendar: "islamic" }).toLocaleUpperCase();
     const fullString = `${dateString} | ${islamic}`;
     return fullString;
 };
@@ -337,10 +356,10 @@ const generateDateString = () => {
  *  Updates prayer times, and renders Prayer items
  * @param {PopupMenu} menu: Panel Menu 
  */
-const renderEntries = (menu) => {
-    renderTitle(menu);
-    renderDate(menu);
-    renderSeparator(menu);
+const renderWidgetEntries = (menu) => {
+    renderWidgetTitle(menu);
+    renderWidgetDate(menu);
+    renderWidgetSeparator(menu);
 
     let count = 0;
     let { index, diff } = findTimeIndex();
@@ -349,7 +368,7 @@ const renderEntries = (menu) => {
 
         // Create prayer item
         let style = count == index ? CURRENT_PRAYER_ITEM_STYLE_CLASS : DEFAULT_PRAYER_ITEM_STYLE_CLASS;
-        let salahItem = createPrayerTimeItem(labels.prayers[count], data[salah].slice(0, -3), style);
+        let salahItem = createWidgetPrayerTimeItem(labels.prayers[count], data[salah].slice(0, -3), style);
         menu.addMenuItem(salahItem);
 
         // create time until/before
@@ -358,7 +377,7 @@ const renderEntries = (menu) => {
         // Determines if the sub item is current prayer or standard
         style = count == index ? CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS : DEFAULT_SUB_ITEM_STYLE_CLASS;
 
-        salahItem = createSecondaryPrayerItem(timePhrase, style);
+        salahItem = createWidgetSecondaryPrayerItem(timePhrase, style);
         menu.addMenuItem(salahItem);
         count++;
     }
@@ -378,7 +397,7 @@ const getVaktijaData = () => {
         let session = new Soup.Session();
 
         // Create a new Soup.Message to represent the API request
-        let message = Soup.Message.new('GET', api);
+        let message = Soup.Message.new('GET', `${vaktijaEUAPI}${defaultCity}`);
 
         // Send the API request asynchronously
         session.send_message(message);
@@ -398,13 +417,16 @@ const getVaktijaData = () => {
  * @returns object: Prayer times object
  */
 const extractDailyPrayers = (html) => {
-    if (html == null) {
+    try {
+        const startIndex = html.indexOf('"dailyPrayersRes":{') + 19;
+        const endIndex = html.indexOf('},"cookiesRes"');
+        const dailyPrayersData = html.slice(startIndex, endIndex);
+
+        return JSON.parse('{' + dailyPrayersData + '}');
+    } catch (error) {
         return { "no1": "XX:XX", "no2": "XX:XX", "no3": "XX:XX", "no4": "XX:XX", "no5": "XX:XX", "no6": "XX:XX" };
     }
-    const startIndex = html.indexOf('"dailyPrayersRes":{') + 19;
-    const endIndex = html.indexOf('},"cookiesRes"');
-    const dailyPrayersData = html.slice(startIndex, endIndex);
-    return JSON.parse('{' + dailyPrayersData + '}');
+
 };
 
 class Extension {
@@ -424,124 +446,151 @@ class Extension {
 
         Main.panel.addToStatusArea(this._uuid, this._indicator);
 
-        stage = new St.BoxLayout({
-            style_class: "bg-container",
-            pack_start: false,
-            vertical: true,
-        });
-        stage.set_x(1970);
-        stage.set_y(78);
+        const settings = ExtensionUtils.getSettings();
+        let isBGWidgetEnabled = settings.get_boolean('use-bg-widget');
 
-        const clock = today.toLocaleString('bs-Latn-BA', { hour: "2-digit", minute: "2-digit" }).toLocaleUpperCase();
-        clockLabelBg = new St.Label({
-            style_class: BG_CLOCK_STYLE_CLASS,
-            text: _(clock),
-            x_expand: true,
-            x_align: Clutter.ActorAlign.CENTER
-        });
-        stage.add_actor(clockLabelBg);
-
-        let title = `Vaktija - Graz`;
-        let titleLabel = new St.Label({
-            style_class: BG_TITLE_STYLE_CLASS,
-            text: _(title),
-            x_expand: true,
-            x_align: Clutter.ActorAlign.CENTER
-        });
-        stage.add_actor(titleLabel);
-
-
-
-        const dateString = generateDateString();
-        dateLabelBg = new St.Label({
-            style_class: BG_DATE_STYLE_CLASS,
-            text: _(dateString),
-            x_expand: true,
-            x_align: Clutter.ActorAlign.CENTER
-        });
-        stage.add_actor(dateLabelBg);
-
-        const separatorItem = new St.BoxLayout({
-            style_class: BG_OUTER_SEPARATOR_STYLE_CLASS,
-        });
-
-        let separatorLabel = new St.Label({
-            style_class: BG_INNER_LABEL_STYLE_CLASS,
-            x_expand: true,
-            x_align: Clutter.ActorAlign.CENTER,
-            width: stage.get_width()
-        });
-
-        separatorItem.add_actor(separatorLabel);
-        stage.add_actor(separatorItem);
-
-        let count = 0;
-        let { index, diff } = findTimeIndex();
-
-        for (const salah in data) {
-            // Create prayer item
-            let style = count == index ? CURRENT_BG_PRAYER_ITEM_STYLE_CLASS : DEFAULT_BG_PRAYER_ITEM_STYLE_CLASS;
-            let salahItem = new St.BoxLayout({
-                style_class: style,
-                pack_start: false,
-            });
-
-            let prayerNameLabel = new St.Label({
-                style_class: "prayer-label",
-                text: _(labels.prayers[count]),
-                x_expand: true,
-                x_align: Clutter.ActorAlign.START
-            });
-
-            let prayerTimeLabel = new St.Label({
-                style_class: "",
-                text: _(data[salah].slice(0, -3)),
-                x_expand: true,
-                x_align: Clutter.ActorAlign.END
-            });
-
-            salahItem.add_actor(prayerNameLabel);
-            salahItem.add_actor(prayerTimeLabel);
-
-            stage.add_actor(salahItem);
-
-            // create time until/before
-            let timePhrase = generateTimePhrase(diff[count]);
-
-            // Determines if the sub item is current prayer or standard
-            style = count == index ? CURRENT_BG_SUB_ITEM_STYLE_CLASS : DEFAULT_BG_SUB_ITEM_STYLE_CLASS;
-
-            salahItem = new St.BoxLayout({
-                style_class: style,
-                pack_start: false,
-                // vertical: true,
-            });
-
-            let subLabel = new St.Label({
-                style_class: "",
-                text: _(timePhrase),
-                x_expand: true,
-                x_align: Clutter.ActorAlign.START
-            });
-
-            salahItem.add_actor(subLabel);
-            stage.add_actor(salahItem);
-
-            count++;
+        if (isBGWidgetEnabled) {
+            let posY = parseInt(settings.get_string('bg-widget-y-pos'));
+            let posX = parseInt(settings.get_string("bg-widget-x-pos"));
+            renderBGPrayerTimesWidget(posX, posY);
         }
-
-        Main.layoutManager._backgroundGroup.add_child(stage);
     }
 
     disable() {
         log("Vaktija: Disable");
-        stage.destroy();
-        stage = null;
+        if (stage) {
+            stage.destroy();
+            stage = null;
+        }
         this._indicator.destroy();
         this._indicator = null;
         isEnabled = false;
     }
 }
+
+/** Draws the background widget with posX and posY as top left corner
+ * 
+ * @param {number} posX - X Position on the screen
+ * @param {number} posY - Y Position on the screen
+ */
+const renderBGPrayerTimesWidget = (posX = 50, posY = 78) => {
+    stage = new St.BoxLayout({
+        style_class: "bg-container",
+        pack_start: false,
+        vertical: true,
+    });
+    stage.set_x(posX);
+    stage.set_y(posY);
+
+    const clock = today.toLocaleString('bs-Latn-BA', { hour: "2-digit", minute: "2-digit" }).toLocaleUpperCase();
+    clockLabelBg = new St.Label({
+        style_class: BG_CLOCK_STYLE_CLASS,
+        text: _(clock),
+        x_expand: true,
+        x_align: Clutter.ActorAlign.CENTER
+    });
+    stage.add_actor(clockLabelBg);
+
+    let city = defaultCity.charAt(0).toUpperCase() + defaultCity.slice(1);
+    let title = `Vaktija - ${city}`;
+    let titleLabel = new St.Label({
+        style_class: BG_TITLE_STYLE_CLASS,
+        text: _(title),
+        x_expand: true,
+        x_align: Clutter.ActorAlign.CENTER
+    });
+    stage.add_actor(titleLabel);
+
+    const dateString = generateDateString();
+    dateLabelBg = new St.Label({
+        style_class: BG_DATE_STYLE_CLASS,
+        text: _(dateString),
+        x_expand: true,
+        x_align: Clutter.ActorAlign.CENTER
+    });
+    stage.add_actor(dateLabelBg);
+
+    const separatorItem = new St.BoxLayout({
+        style_class: BG_OUTER_SEPARATOR_STYLE_CLASS,
+    });
+
+    let separatorLabel = new St.Label({
+        style_class: BG_INNER_LABEL_STYLE_CLASS,
+        x_expand: true,
+        x_align: Clutter.ActorAlign.CENTER,
+        width: stage.get_width()
+    });
+
+    separatorItem.add_actor(separatorLabel);
+    stage.add_actor(separatorItem);
+
+    renderBGPrayerItems();
+    Main.layoutManager._backgroundGroup.add_child(stage);
+};
+
+/**
+ * Renders prayer items within the stage 
+ */
+const renderBGPrayerItems = () => {
+    let count = 0;
+    let { index, diff } = findTimeIndex();
+
+    salahItemsContainer = new St.BoxLayout({
+        pack_start: false,
+        vertical: true,
+    });
+    for (const salah in data) {
+        // Create prayer item
+        let style = count == index ? CURRENT_BG_PRAYER_ITEM_STYLE_CLASS : DEFAULT_BG_PRAYER_ITEM_STYLE_CLASS;
+        let salahItem = new St.BoxLayout({
+            style_class: style,
+            pack_start: false,
+        });
+
+        let prayerNameLabel = new St.Label({
+            style_class: "prayer-label",
+            text: _(labels.prayers[count]),
+            x_expand: true,
+            x_align: Clutter.ActorAlign.START
+        });
+
+        let prayerTimeLabel = new St.Label({
+            style_class: "",
+            text: _(data[salah].slice(0, -3)),
+            x_expand: true,
+            x_align: Clutter.ActorAlign.END
+        });
+
+        salahItem.add_actor(prayerNameLabel);
+        salahItem.add_actor(prayerTimeLabel);
+
+        salahItemsContainer.add_actor(salahItem);
+
+        // create time until/before
+        let timePhrase = generateTimePhrase(diff[count]);
+
+        // Determines if the sub item is current prayer or standard
+        style = count == index ? CURRENT_BG_SUB_ITEM_STYLE_CLASS : DEFAULT_BG_SUB_ITEM_STYLE_CLASS;
+
+        salahItem = new St.BoxLayout({
+            style_class: style,
+            pack_start: false,
+            // vertical: true,
+        });
+
+        let subLabel = new St.Label({
+            style_class: "",
+            text: _(timePhrase),
+            x_expand: true,
+            x_align: Clutter.ActorAlign.START
+        });
+
+        salahItem.add_actor(subLabel);
+        salahItemsContainer.add_actor(salahItem);
+        count++;
+    }
+    stage.add_actor(salahItemsContainer);
+};
 
 function init(meta) {
     return new Extension(meta.uuid);
@@ -559,7 +608,7 @@ const Indicator = GObject.registerClass(
                 icon_size: 16
             }));
 
-            renderEntries(this.menu);
-            this.menu.connect("open-state-changed", rerenderPrayerTimes);
+            renderWidgetEntries(this.menu);
+            this.menu.connect("open-state-changed", rerenderWidgetPrayerTimes);
         }
     });

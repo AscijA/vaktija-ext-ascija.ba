@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.vaktija" 
+          path="/org/gnome/shell/extensions/vaktija/">
+    <!-- See also: https://docs.gtk.org/glib/gvariant-format-strings.html -->
+    <key name="use-vaktija-eu" type="b">
+      <default>true</default>
+      <summary>Use prayer times for cities from Vaktija.eu</summary>
+    </key>
+    <key name="vaktija-eu-city" type="s">
+      <default>'Graz'</default>
+      <summary>Name of the city from Vaktija.eu</summary>
+    </key>
+    <key name="use-vaktija-ba" type="b">
+      <default>false</default>
+      <summary>Use prayer times for cities from Vaktija.ba</summary>
+    </key>
+    <key name="vaktija-ba-city" type="s">
+      <default>'Gradacac'</default>
+      <summary>Name of the city from Vaktija.ba</summary>
+    </key>
+
+    <key name="use-bg-widget" type="b">
+      <default>true</default>
+      <summary>Show background Widget</summary>
+    </key>
+    <key name="bg-widget-x-pos" type="s">
+      <default>"50"</default>
+      <summary>X Position on the screen for the background widget</summary>
+    </key>
+    <key name="bg-widget-y-pos" type="s">
+      <default>"78"</default>
+      <summary>Y Position on the screen for the background widget</summary>
+    </key>
+    
+    <key name="date-locale" type="s">
+      <default>""</default>
+      <summary>Locale for Date display</summary>
+    </key>
+
+  </schema>
+</schemalist>

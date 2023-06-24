@@ -20,9 +20,14 @@ function make-local-install {
       rm -r $DEST
       mkdir $DEST
     fi
+    
+    echo "Compiling schemas..."
+    glib-compile-schemas ./src/schemas/
+    echo "Compiling done"
 
-    cp -r src/* $DEST/
-
+    echo "Copying files..."
+    cp -r ./src/* $DEST/
+    echo "Copying done"
     echo 'Done'
 }
 

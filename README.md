@@ -1,6 +1,6 @@
 # vaktija-ascija.ba  
 
-This is a GNOME Shell extension called "Vaktija" that displays daily prayer times of European cities which are a part of Bosnian Islamic Community in the panel menu.
+This is extension displays daily prayer times of European cities which are a part of Bosnian Islamic Community in the panel menu.
 
 ## License
 
@@ -13,11 +13,11 @@ This program is licensed under the GNU General Public License version 2.0. For m
 ## Optional
 - [Poppins Font](https://fonts.google.com/specimen/Poppins)
 - GNOME Shell Theme [Qogir-dark](https://www.gnome-look.org/p/1230631/)  
-*Currently works best with Qogir-dark, which is the theme used in development. Works with most of the dark themes. Light themes need some adaptation in the `stylesheet.css`*
+
   
 ## Installation
 
-1. Clone this repository or download the source code.
+1. Clone this repository or download the source code and extract the archive.
 2. Run `./install.sh local-install`
 3. Restart the GNOME Shell by pressing **Alt+F2** and entering `r` in the prompt, then press **Enter**.
 4. Enable the extension using **GNOME Extensions** or by running `gnome-extensions enable vaktija@ascija.ba` in your terminal .
@@ -34,13 +34,14 @@ After installing and enabling the extension, a new icon ![Vaktija icon](assets/v
 
 Following improvements and features are planned to be implamented in future:
 - [ ] Preferences with following options:
-  - [ ] All cities provided by [Vaktija.eu](https://vaktija.eu/), currently supports only Graz, Austria
+  - [X] All cities provided by [Vaktija.eu](https://vaktija.eu/), ~~currently supports only Graz, Austria~~
   - [ ] All cities provided by [Vaktija.ba](https://vaktija.ba/)
   - [ ] Other cities in Europe
   - [ ] 12/24 time formats, currently only 24 hour format is supported 
   - [ ] Light Theme
+  - [ ] Add positioning for Background Widget
 - [x] Highlight current prayer time and show remaining time until next Prayer
-- [x] Add Desktop Background Widget
+- [X] Add Desktop Background Widget
 - [ ] Add Notifications X minutes before the prayer
 - [x] Custom Translations via JSON file
 - [x] Guide for Translation JSON file
@@ -50,15 +51,13 @@ Following improvements and features are planned to be implamented in future:
 
 ## Acknowledgements
 
-This extension is based on the work of [Vaktija.eu](https://vaktija.eu/) and [Vaktija.ba](https://vaktija.ba/) and inspired by their websites.
+This extension is inspired by [Vaktija.eu](https://vaktija.eu/) and [Vaktija.ba](https://vaktija.ba/).
 Vectors and icons inpired by [SVGRepo](https://www.svgrepo.com/svg/48266/muslim-man-praying).
 
 
 ## Contact
 
-For any questions or feedback, please contact the extension author at maid.ascic@student.tugraz.at.  
-For any feature request please submit an issue.  
-
+For any questions, feedback, feature request or bugs please submit an issue.  
 
 ## Notice
 
