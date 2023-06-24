@@ -35,11 +35,10 @@ After installing and enabling the extension, a new icon ![Vaktija icon](assets/v
 Following improvements and features are planned to be implamented in future:
 - [ ] Preferences with following options:
   - [X] All cities provided by [Vaktija.eu](https://vaktija.eu/), ~~currently supports only Graz, Austria~~
-  - [ ] All cities provided by [Vaktija.ba](https://vaktija.ba/)
   - [ ] Other cities in Europe
   - [ ] 12/24 time formats, currently only 24 hour format is supported 
   - [ ] Light Theme
-  - [ ] Add positioning for Background Widget
+  - [X] Add positioning for Background Widget
 - [x] Highlight current prayer time and show remaining time until next Prayer
 - [X] Add Desktop Background Widget
 - [ ] Add Notifications X minutes before the prayer
