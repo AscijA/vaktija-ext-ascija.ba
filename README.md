@@ -1,4 +1,4 @@
-# vaktija-ascija.ba  
+# vaktija-ext-ascija.ba  
 
 This is extension displays daily prayer times of European cities which are a part of Bosnian Islamic Community in the panel menu.
 
