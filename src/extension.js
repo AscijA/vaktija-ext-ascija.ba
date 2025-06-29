@@ -1,614 +1,276 @@
-/* extension.js
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+// extension.js
+/*
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-/* exported init */
+import GLib      from 'gi://GLib';
+import Soup      from 'gi://Soup?version=3.0';
+import St        from 'gi://St';
+import Clutter   from 'gi://Clutter';
+import Gio       from 'gi://Gio';
+import GObject   from 'gi://GObject';
+import * as Main      from 'resource:///org/gnome/shell/ui/main.js';
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import { Extension, gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 const GETTEXT_DOMAIN = 'vaktija-extension';
 
-const { GObject, St, Soup, Gio, Gtk, GLib, Clutter } = imports.gi;
+// derive on-disk extension path
+const extFile       = Gio.File.new_for_uri(import.meta.url);
+const extDir        = extFile.get_parent();
+const EXTENSION_PATH = extDir.get_path();
+const ICON_PATH      = `${EXTENSION_PATH}/vaktija-symbolic.svg`;
+const LABELS_PATH    = `${EXTENSION_PATH}/translations/labels.json`;
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Main = imports.ui.main;
-const PanelMenu = imports.ui.panelMenu;
-const PopupMenu = imports.ui.popupMenu;
+// style constants
+const TITLE_ITEM_STYLE_CLASS               = 'title';
+const CONNECTION_ERROR_TITLE_STYLE_CLASS   = `${TITLE_ITEM_STYLE_CLASS} con-error`;
+const DATE_STYLE_CLASS                     = 'date-title';
+const OUTER_SEPARATOR_STYLE_CLASS          = 'outer-separator';
+const INNER_LABEL_STYLE_CLASS              = `inner-label ${OUTER_SEPARATOR_STYLE_CLASS}`;
+const DEFAULT_PRAYER_ITEM_STYLE_CLASS      = 'default-prayer-item';
+const CURRENT_PRAYER_ITEM_STYLE_CLASS      = `current-prayer-item ${DEFAULT_PRAYER_ITEM_STYLE_CLASS}`;
+const PRAYER_LABEL_STYLE_CLASS             = 'prayer-label';
+const PRAYER_TIME_STYLE_CLASS              = 'prayer-time';
+const DEFAULT_SUB_ITEM_STYLE_CLASS         = 'next-prayer';
+const CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS  = `current-sub ${DEFAULT_SUB_ITEM_STYLE_CLASS}`;
 
-const _ = ExtensionUtils.gettext;
-
-/* Style Constants */
-const TITLE_ITEM_STYLE_CLASS = `title`;
-const CONNECTION_ERROR_TITLE_STYLE_CLASS = `${TITLE_ITEM_STYLE_CLASS} con-error`;
-
-const DATE_STYLE_CLASS = `date-title`;
-
-const OUTER_SEPARATOR_STYLE_CLASS = `outer-separator`;
-const INNER_LABEL_STYLE_CLASS = `inner-label ${OUTER_SEPARATOR_STYLE_CLASS}`;
-
-const DEFAULT_PRAYER_ITEM_STYLE_CLASS = `default-prayer-item`;
-const CURRENT_PRAYER_ITEM_STYLE_CLASS = `current-prayer-item ${DEFAULT_PRAYER_ITEM_STYLE_CLASS}`;
-
-const PRAYER_LABEL_STYLE_CLASS = `prayer-label`;
-const PRAYER_TIME_STYLE_CLASS = `prayer-time`;
-
-const DEFAULT_SUB_ITEM_STYLE_CLASS = `next-prayer`;
-const CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS = `current-sub ${DEFAULT_SUB_ITEM_STYLE_CLASS}`;
-
-/* BG Styles */
-const DEFAULT_BG_PRAYER_ITEM_STYLE_CLASS = `bg-item-main`;
-const CURRENT_BG_ITEM_STYLE_CLASS = `bg-item-current`;
-const CURRENT_BG_PRAYER_ITEM_STYLE_CLASS = `${DEFAULT_BG_PRAYER_ITEM_STYLE_CLASS} ${CURRENT_BG_ITEM_STYLE_CLASS}`;
-
-const DEFAULT_BG_SUB_ITEM_STYLE_CLASS = `bg-item-sub`;
-const CURRENT_BG_SUB_ITEM_STYLE_CLASS = `${DEFAULT_BG_SUB_ITEM_STYLE_CLASS} ${CURRENT_BG_ITEM_STYLE_CLASS}`;
-
-const BG_TITLE_STYLE_CLASS = `bg-title`;
-const BG_CLOCK_STYLE_CLASS = `bg-clock`;
-const BG_DATE_STYLE_CLASS = `bg-date`;
-const BG_OUTER_SEPARATOR_STYLE_CLASS = `bg-outer-separator`;
-const BG_INNER_LABEL_STYLE_CLASS = `bg-inner-label`;
-
-/* --------------- */
-
-/* Other Constants */
-const iconPath = `${Me.path}/vaktija-symbolic.svg`;
-/* --------------- */
-// Default Labels 
-let labels = {
-    prayers: [
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""],
-    prayerNext: "",
-    prayerPrev: "",
-    hour1: "",
-    hour2: "",
-    hour3: "",
-    connectionError: "",
-    timeLabelFirstPrev: true,
-    timeLabelFirstNext: true
-};
-
-let defaultCity = `graz`;
-let vaktijaEUAPI = `https://vaktija.eu/`;
-// let timeFormat;
-let labelsPath = `${Me.path}/translations/labels.json`;
-let today;
-let isEnabled;
-let dateWidget;
-let data = {};
-let stage;
-let dateLabelBg;
-let clockLabelBg;
-let salahItemsContainer;
-
-/**
- * Read translated labels from labels.json
- * 
- * @returns Object containing labels 
- */
-const getLabels = () => {
-    try {
-        const file = Gio.File.new_for_path(labelsPath);
-        const [, contents, etag] = file.load_contents(null);
-        const decoder = new TextDecoder('utf-8');
-        const contentsString = decoder.decode(contents);
-        const loadedLabels = JSON.parse(contentsString);
-        return loadedLabels;
-    } catch (error) {
-        return labels;
-    }
-};
-
-/**
- * 
- * @param {string} labelText : Content of prayer time item
- * @param {string} styleClass : CSS Class name
- * @returns PopupMenuItem Containing Prayer time
- */
-const createWidgetSecondaryPrayerItem = (labelText, styleClass = DEFAULT_PRAYER_ITEM_STYLE_CLASS, alignment = Clutter.ActorAlign.START) => {
-    // Create the PopupMenuItem 
-    const salahItem = new PopupMenu.PopupMenuItem("", { style_class: styleClass });
-    salahItem.sensitive = false;
-    salahItem.setOrnament(PopupMenu.Ornament.HIDDEN);
-
-    let innerLabel = new St.Label({
-        style_class: "",
-        text: _(labelText),
-        x_expand: true,
-        x_align: alignment
-    });
-    salahItem.add_actor(innerLabel);
-    return salahItem;
-};
-
-/**
- * 
- * @param {string} prayerName : Name of the prayer
- * @param {string} prayerTime : Time of the prayer
- * @param {string} styleClass : CSS Class name
- * @returns PopupMenuItem Containing Prayer time
- */
-const createWidgetPrayerTimeItem = (prayerName, prayerTime, styleClass = DEFAULT_PRAYER_ITEM_STYLE_CLASS) => {
-    // Create the PopupMenuItem 
-    const salahItem = new PopupMenu.PopupMenuItem("", {
-        style_class: styleClass,
-        hover: false,
-    });
-    salahItem.setOrnament(PopupMenu.Ornament.HIDDEN);
-    salahItem.sensitive = false;
-
-    let prayerNameLabel = new St.Label({
-        style_class: PRAYER_LABEL_STYLE_CLASS,
-        text: _(prayerName),
-        x_expand: true,
-        x_align: Clutter.ActorAlign.START
-    });
-
-    let prayerTimeLabel = new St.Label({
-        style_class: PRAYER_TIME_STYLE_CLASS,
-        text: _(prayerTime),
-        x_expand: true,
-        x_align: Clutter.ActorAlign.END
-    });
-
-    salahItem.add_actor(prayerNameLabel);
-    salahItem.add_actor(prayerTimeLabel);
-
-    return salahItem;
-};
-
-/**
- * Updates and rerenders Prayer Times on menu open
- * 
- * @param {PopupMenu.PopupBaseMenu} menu The emitting object
- * @param {boolean} open True if the menu is open, false if closed
- */
-const rerenderWidgetPrayerTimes = (menu, open) => {
-    menu.removeAll();
-    if (open) {
-        labels = getLabels();
-        data = getVaktijaData();
-    }
-    renderWidgetEntries(menu);
-};
-
-/**
- * Finds the index of the current prayer and returns remaining time until individual prayers
- *
- * @return {object} index: index of the current prayer, diff: remaining time
- */
-const findTimeIndex = () => {
-    let index = 0;
-    let retVal = {
-        index: 0,
-        diff: [],
-    };
-    for (const salah in data) {
-        const today = new Date();
-        const date = new Date(`${today.toDateString()} ${data[salah]}`);
-        let diff = (date - today) / (1000 * 60 * 60);
-        retVal.diff.push(diff);
-        if (today > date) {
-            retVal.index = index;
-        }
-        index++;
-    }
-    return retVal;
-};
-
-/**
- * Renders title 
- *
- * @param {PopupMenu} menu: Panel Menu 
- */
-const renderWidgetTitle = (menu) => {
-    const clock = today.toLocaleString('bs-Latn-BA', { hour: "2-digit", minute: "2-digit" }).toLocaleUpperCase();
-    let city = defaultCity.charAt(0).toUpperCase() + defaultCity.slice(1);
-    let titleLabel = `Vaktija - ${city}   |   ${clock}`;
-
-    let titleStyleClass = TITLE_ITEM_STYLE_CLASS;
-    if (data.no1 == "XX:XX") {
-        titleLabel = labels.connectionError;
-        titleStyleClass = CONNECTION_ERROR_TITLE_STYLE_CLASS;
-    }
-    let title = createWidgetSecondaryPrayerItem(titleLabel, titleStyleClass, Clutter.ActorAlign.CENTER);
-    // new PopupMenu.PopupMenuItem(titleLabel, { style_class: titleStyleClass });
-    // title.sensitive = false;
-    // title.label_actor.set_x_expand(true);
-    // title.label_actor.set_x_align(Clutter.ActorAlign.CENTER);
-    // title.setOrnament(PopupMenu.Ornament.HIDDEN);
-    menu.addMenuItem(title);
-};
-
-/**
- *  Render current gregorian and islamic date
- *
- * @param {PopupMenu} menu: Panel Menu 
- */
-const renderWidgetDate = (menu) => {
-    const fullString = generateDateString();
-    dateWidget = createWidgetSecondaryPrayerItem(fullString, DATE_STYLE_CLASS, Clutter.ActorAlign.CENTER);
-    menu.addMenuItem(dateWidget, 2);
-};
-
-/**
- * Render border separator
- *
- * @param {PopupMenu} menu: Panel Menu 
- */
-const renderWidgetSeparator = (menu) => {
-    const separatorItem = new PopupMenu.PopupMenuItem("", {
-        style_class: OUTER_SEPARATOR_STYLE_CLASS,
-        hover: false,
-    });
-    separatorItem.setOrnament(PopupMenu.Ornament.HIDDEN);
-    separatorItem.sensitive = false;
-
-    let separatorLabel = new St.Label({
-        style_class: INNER_LABEL_STYLE_CLASS,
-        x_expand: true,
-        x_align: Clutter.ActorAlign.CENTER,
-        width: dateWidget.get_width() * 0.9
-    });
-    separatorItem.add_actor(separatorLabel);
-    menu.addMenuItem(separatorItem);
-};
-
-/**
- *  Updates the clock and prayer times once every minute
- *
- * @param {PopupMenu} menu: Panel Menu 
- * @return {boolean} isEnabled, should the function continue re-executing or not 
- */
-const updateDates = (menu) => {
-    let now = new Date();
-    const settings = ExtensionUtils.getSettings();
-    let city = settings.get_string('vaktija-eu-city').toLowerCase();
-    // update for clocks and dates
-    if (now.getMinutes() != today.getMinutes() || city != defaultCity) {
-        today = now;
-        defaultCity = city;
-
-        const settings = ExtensionUtils.getSettings();
-        let isBGWidgetEnabled = settings.get_boolean('use-bg-widget');
-        if (isBGWidgetEnabled) {
-            stage.destroy();
-            let posY = parseInt(settings.get_string('bg-widget-y-pos'));
-            let posX = parseInt(settings.get_string("bg-widget-x-pos"));
-            renderBGPrayerTimesWidget(posX, posY);
-            // const clock = today.toLocaleString('bs-Latn-BA', { hour: "2-digit", minute: "2-digit" }).toLocaleUpperCase();
-            // clockLabelBg.set_text(clock);
-
-            // if (now.getDate() != today.getDate() || city != defaultCity) {
-            //     dateLabelBg.set_text(generateDateString());
-            // }
-
-        }
-        rerenderWidgetPrayerTimes(menu, true);
-    }
-
-
-    return isEnabled;
-};
-
-/**
- *  Generates how the time phrase of a subitem should contain
- *
- * @return {string} timePhrase - Time Phrase to be rendered
- */
-const generateTimePhrase = (diff) => {
-    let timeDifference = diff;
-
-    // determines which label for prev or next prayer should be shown
-    let beforeAfter = timeDifference > 0 ? labels.prayerNext : labels.prayerPrev;
-
-    // if less than 1 hour, time diff will be displayed in minutes
-    let minOrHour = Math.abs(Math.abs(timeDifference) < 1 ? Math.round(timeDifference * 60) : Math.round(timeDifference));
-
-    // determines if the time unit is minutes or hours, mainly written for bosnian translation
-    timeDifference = Math.abs(timeDifference);
-    let timeUnit = timeDifference < 1
-        ? "min"
-
-        /* START: This part is to be modified if the singular/plural is not shown correctly for your language */
-        : Math.round(timeDifference) >= 5 && Math.round(timeDifference) <= 20
-            ? labels.hour2
-            : (Math.round(timeDifference) == 1 || (Math.round(timeDifference) == 21 && labels.hour2 != labels.hour3))
-                ? labels.hour1
-                : labels.hour3;
-    /* END*/
-    // determines if the time difference should be printed first
-    let format = beforeAfter == labels.prayerNext ? labels.timeLabelFirstNext : labels.timeLabelFirstPrev;
-    let timePhrase = format ? `${beforeAfter} ${minOrHour} ${timeUnit}` : `${minOrHour} ${timeUnit} ${beforeAfter}`;
-    return timePhrase;
-};
-
-
-/** Generates and returns date string 
- * 
- * @returns {string} fullString : Returns Date string to be printed
- */
-const generateDateString = () => {
-    const dateString = today.toLocaleString('en', { month: 'short', day: "2-digit", weekday: "short" }).toLocaleUpperCase();
-    const islamic = today.toLocaleString('en', { month: 'long', day: "2-digit", calendar: "islamic" }).toLocaleUpperCase();
-    const fullString = `${dateString} | ${islamic}`;
-    return fullString;
-};
-/**
- *  Updates prayer times, and renders Prayer items
- * @param {PopupMenu} menu: Panel Menu 
- */
-const renderWidgetEntries = (menu) => {
-    renderWidgetTitle(menu);
-    renderWidgetDate(menu);
-    renderWidgetSeparator(menu);
-
-    let count = 0;
-    let { index, diff } = findTimeIndex();
-
-    for (const salah in data) {
-
-        // Create prayer item
-        let style = count == index ? CURRENT_PRAYER_ITEM_STYLE_CLASS : DEFAULT_PRAYER_ITEM_STYLE_CLASS;
-        let salahItem = createWidgetPrayerTimeItem(labels.prayers[count], data[salah].slice(0, -3), style);
-        menu.addMenuItem(salahItem);
-
-        // create time until/before
-        let timePhrase = generateTimePhrase(diff[count]);
-
-        // Determines if the sub item is current prayer or standard
-        style = count == index ? CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS : DEFAULT_SUB_ITEM_STYLE_CLASS;
-
-        salahItem = createWidgetSecondaryPrayerItem(timePhrase, style);
-        menu.addMenuItem(salahItem);
-        count++;
-    }
-};
-
-/***
- *  Due to the lack of exposed endpoint of vaktija.eu for prayer times, complete HTML file is loaded
- * 
- * @returns String: HTML String containing Prayer Times is returned
- */
-const getVaktijaData = () => {
-    let now = new Date();
-    // if date has not changed return old data, improves resposivness
-    if (now.getDate() != today.getDate() || data != {}) {
-
-        // Create a new Soup.Session to handle the API request
-        let session = new Soup.Session();
-
-        // Create a new Soup.Message to represent the API request
-        let message = Soup.Message.new('GET', `${vaktijaEUAPI}${defaultCity}`);
-
-        // Send the API request asynchronously
-        session.send_message(message);
-
-        // Parse the response into data object
-        return extractDailyPrayers(message["response-body"].data);
-
-    } else {
-        return data;
-    }
-};
-
-/***
- * Extracts Prayer times from an HTML String
- * 
- * @param html: HTML String form which Prayer Times will be Extracted
- * @returns object: Prayer times object
- */
-const extractDailyPrayers = (html) => {
-    try {
-        const startIndex = html.indexOf('"dailyPrayersRes":{') + 19;
-        const endIndex = html.indexOf('},"cookiesRes"');
-        const dailyPrayersData = html.slice(startIndex, endIndex);
-
-        return JSON.parse('{' + dailyPrayersData + '}');
-    } catch (error) {
-        return { "no1": "XX:XX", "no2": "XX:XX", "no3": "XX:XX", "no4": "XX:XX", "no5": "XX:XX", "no6": "XX:XX" };
-    }
-
-};
-
-class Extension {
-    constructor(uuid) {
-        this._uuid = uuid;
-        ExtensionUtils.initTranslations(GETTEXT_DOMAIN);
-    }
-    enable() {
-        log("Vaktija: Enable");
-        today = new Date();
-        data = getVaktijaData();
-        labels = getLabels();
-        isEnabled = true;
-        this._indicator = new Indicator();
-
-        GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 1, () => { return updateDates(this._indicator.menu); });
-
-        Main.panel.addToStatusArea(this._uuid, this._indicator);
-
-        const settings = ExtensionUtils.getSettings();
-        let isBGWidgetEnabled = settings.get_boolean('use-bg-widget');
-
-        if (isBGWidgetEnabled) {
-            let posY = parseInt(settings.get_string('bg-widget-y-pos'));
-            let posX = parseInt(settings.get_string("bg-widget-x-pos"));
-            renderBGPrayerTimesWidget(posX, posY);
-        }
-    }
-
-    disable() {
-        log("Vaktija: Disable");
-        if (stage) {
-            stage.destroy();
-            stage = null;
-        }
-        this._indicator.destroy();
-        this._indicator = null;
-        isEnabled = false;
-    }
+// helper: create a sub-line menu item
+function createSecondaryItem(text, style = DEFAULT_SUB_ITEM_STYLE_CLASS, align = Clutter.ActorAlign.START) {
+  const item = new PopupMenu.PopupMenuItem('', { style_class: style, hover: false });
+  item.setOrnament(PopupMenu.Ornament.HIDDEN);
+  item.sensitive = false;
+  item.actor.add_child(new St.Label({ text: _(text), x_expand: true, x_align: align }));
+  return item;
 }
 
-/** Draws the background widget with posX and posY as top left corner
- * 
- * @param {number} posX - X Position on the screen
- * @param {number} posY - Y Position on the screen
- */
-const renderBGPrayerTimesWidget = (posX = 50, posY = 78) => {
-    stage = new St.BoxLayout({
-        style_class: "bg-container",
-        pack_start: false,
-        vertical: true,
-    });
-    stage.set_x(posX);
-    stage.set_y(posY);
-
-    const clock = today.toLocaleString('bs-Latn-BA', { hour: "2-digit", minute: "2-digit" }).toLocaleUpperCase();
-    clockLabelBg = new St.Label({
-        style_class: BG_CLOCK_STYLE_CLASS,
-        text: _(clock),
-        x_expand: true,
-        x_align: Clutter.ActorAlign.CENTER
-    });
-    stage.add_actor(clockLabelBg);
-
-    let city = defaultCity.charAt(0).toUpperCase() + defaultCity.slice(1);
-    let title = `Vaktija - ${city}`;
-    let titleLabel = new St.Label({
-        style_class: BG_TITLE_STYLE_CLASS,
-        text: _(title),
-        x_expand: true,
-        x_align: Clutter.ActorAlign.CENTER
-    });
-    stage.add_actor(titleLabel);
-
-    const dateString = generateDateString();
-    dateLabelBg = new St.Label({
-        style_class: BG_DATE_STYLE_CLASS,
-        text: _(dateString),
-        x_expand: true,
-        x_align: Clutter.ActorAlign.CENTER
-    });
-    stage.add_actor(dateLabelBg);
-
-    const separatorItem = new St.BoxLayout({
-        style_class: BG_OUTER_SEPARATOR_STYLE_CLASS,
-    });
-
-    let separatorLabel = new St.Label({
-        style_class: BG_INNER_LABEL_STYLE_CLASS,
-        x_expand: true,
-        x_align: Clutter.ActorAlign.CENTER,
-        width: stage.get_width()
-    });
-
-    separatorItem.add_actor(separatorLabel);
-    stage.add_actor(separatorItem);
-
-    renderBGPrayerItems();
-    Main.layoutManager._backgroundGroup.add_child(stage);
-};
-
-/**
- * Renders prayer items within the stage 
- */
-const renderBGPrayerItems = () => {
-    let count = 0;
-    let { index, diff } = findTimeIndex();
-
-    salahItemsContainer = new St.BoxLayout({
-        pack_start: false,
-        vertical: true,
-    });
-    for (const salah in data) {
-        // Create prayer item
-        let style = count == index ? CURRENT_BG_PRAYER_ITEM_STYLE_CLASS : DEFAULT_BG_PRAYER_ITEM_STYLE_CLASS;
-        let salahItem = new St.BoxLayout({
-            style_class: style,
-            pack_start: false,
-        });
-
-        let prayerNameLabel = new St.Label({
-            style_class: "prayer-label",
-            text: _(labels.prayers[count]),
-            x_expand: true,
-            x_align: Clutter.ActorAlign.START
-        });
-
-        let prayerTimeLabel = new St.Label({
-            style_class: "",
-            text: _(data[salah].slice(0, -3)),
-            x_expand: true,
-            x_align: Clutter.ActorAlign.END
-        });
-
-        salahItem.add_actor(prayerNameLabel);
-        salahItem.add_actor(prayerTimeLabel);
-
-        salahItemsContainer.add_actor(salahItem);
-
-        // create time until/before
-        let timePhrase = generateTimePhrase(diff[count]);
-
-        // Determines if the sub item is current prayer or standard
-        style = count == index ? CURRENT_BG_SUB_ITEM_STYLE_CLASS : DEFAULT_BG_SUB_ITEM_STYLE_CLASS;
-
-        salahItem = new St.BoxLayout({
-            style_class: style,
-            pack_start: false,
-            // vertical: true,
-        });
-
-        let subLabel = new St.Label({
-            style_class: "",
-            text: _(timePhrase),
-            x_expand: true,
-            x_align: Clutter.ActorAlign.START
-        });
-
-        salahItem.add_actor(subLabel);
-        salahItemsContainer.add_actor(salahItem);
-        count++;
-    }
-    stage.add_actor(salahItemsContainer);
-};
-
-function init(meta) {
-    return new Extension(meta.uuid);
+// helper: create a prayer name+time menu item
+function createPrayerItem(name, time, style = DEFAULT_PRAYER_ITEM_STYLE_CLASS) {
+  const item = new PopupMenu.PopupMenuItem('', { style_class: style, hover: false });
+  item.setOrnament(PopupMenu.Ornament.HIDDEN);
+  item.sensitive = false;
+  item.actor.add_child(new St.Label({
+    style_class: PRAYER_LABEL_STYLE_CLASS,
+    text: _(name),
+    x_expand: true,
+    x_align: Clutter.ActorAlign.START
+  }));
+  item.actor.add_child(new St.Label({
+    style_class: PRAYER_TIME_STYLE_CLASS,
+    text: _(time),
+    x_expand: true,
+    x_align: Clutter.ActorAlign.END
+  }));
+  return item;
 }
 
+export default class VaktijaExtension extends Extension {
+  constructor(metadata) {
+    super(metadata);
+    this._settings  = null;
+    this._timeoutId = null;
+    this._indicator = null;
+    this._today     = new Date();
+    this._labels    = this._loadLabels();
+    this._data      = {};
+  }
+
+  enable() {
+    this._settings = this.getSettings();
+
+    // Create panel indicator
+    this._indicator = new Indicator(this);
+    Main.panel.addToStatusArea(this.metadata.uuid, this._indicator);
+
+    // Update every minute
+    this._timeoutId = GLib.timeout_add_seconds(
+      GLib.PRIORITY_DEFAULT, 60,
+      () => this._updateDates()
+    );
+
+    // initial fetch
+    this._fetchVaktijaData();
+  }
+
+  disable() {
+    if (this._timeoutId) {
+      GLib.source_remove(this._timeoutId);
+      this._timeoutId = null;
+    }
+    if (this._indicator) {
+      this._indicator.destroy();
+      this._indicator = null;
+    }
+  }
+
+  /* — Internal helpers — */
+
+  _loadLabels() {
+    try {
+      const file = Gio.File.new_for_path(LABELS_PATH);
+      const [, contents] = file.load_contents(null);
+      return JSON.parse(new TextDecoder('utf-8').decode(contents));
+    } catch {
+      return {
+        prayers: ["","","","","",""],
+        prayerNext: "", prayerPrev: "",
+        hour1: "", hour2: "", hour3: "",
+        connectionError: "",
+        timeLabelFirstPrev: true,
+        timeLabelFirstNext: true
+      };
+    }
+  }
+
+  _fetchVaktijaData() {
+    const city    = this._settings.get_string('vaktija-eu-city').toLowerCase();
+    const session = new Soup.Session();
+    const msg     = Soup.Message.new('GET', `https://vaktija.eu/${city}`);
+    const bytes   = session.send_and_read(msg, null);
+    const html    = new TextDecoder('utf-8').decode(bytes.get_data());
+    this._data    = this._extractDailyPrayers(html);
+    return this._data;
+  }
+
+  _extractDailyPrayers(html) {
+    try {
+      const m = html.match(
+        /<script id="__NEXT_DATA__" type="application\/json">([^<]+)<\/script>/
+      );
+      const nextData = JSON.parse(m[1]);
+      const d = nextData.props.pageProps.dailyPrayersRes;
+      return {
+        no1: d.fajr    || "XX:XX",
+        no2: d.sunrise || "XX:XX",
+        no3: d.dhuhr   || "XX:XX",
+        no4: d.asr     || "XX:XX",
+        no5: d.maghrib || "XX:XX",
+        no6: d.isha   || "XX:XX"
+      };
+    } catch {
+      return { no1:"XX:XX",no2:"XX:XX",no3:"XX:XX",no4:"XX:XX",no5:"XX:XX",no6:"XX:XX" };
+    }
+  }
+
+  _findTimeIndex() {
+    const now = new Date();
+    let idx = 0, current = 0;
+    const diffs = [];
+    for (const k in this._data) {
+      const d = new Date(`${now.toDateString()} ${this._data[k]}`);
+      const dh = (d - now) / 36e5;
+      diffs.push(dh);
+      if (now > d) current = idx;
+      idx++;
+    }
+    return { index: current, diff: diffs };
+  }
+
+  _generateDateString() {
+    const g = this._today
+      .toLocaleString('en',{month:'short',day:"2-digit",weekday:"short"})
+      .toUpperCase();
+    const i = this._today
+      .toLocaleString('en',{month:'long',day:"2-digit",calendar:"islamic"})
+      .toUpperCase();
+    return `${g} | ${i}`;
+  }
+
+  _generateTimePhrase(diff) {
+    const lab = this._labels;
+    const beforeAfter = diff > 0 ? lab.prayerNext : lab.prayerPrev;
+    const absD = Math.abs(diff);
+    const cnt  = absD < 1 ? Math.round(absD*60) : Math.round(absD);
+    let unit;
+    if (absD < 1)                unit = "min";
+    else if (cnt >= 5 && cnt <= 20) unit = lab.hour2;
+    else if (cnt === 1 || (cnt===21 && lab.hour2!==lab.hour3)) unit = lab.hour1;
+    else                          unit = lab.hour3;
+
+    const fmtNext = lab.timeLabelFirstNext
+      ? `${beforeAfter} ${cnt} ${unit}`
+      : `${cnt} ${unit} ${beforeAfter}`;
+    const fmtPrev = lab.timeLabelFirstPrev
+      ? `${beforeAfter} ${cnt} ${unit}`
+      : `${cnt} ${unit} ${beforeAfter}`;
+
+    return beforeAfter === lab.prayerNext ? fmtNext : fmtPrev;
+  }
+
+  _updateDates() {
+    // refresh data and rerender
+    this._fetchVaktijaData();
+    this._indicator._rerender();
+    return true;
+  }
+}
+
+// ─── Panel indicator ───────────────────────────────────────────────────────────
 const Indicator = GObject.registerClass(
-    class Indicator extends PanelMenu.Button {
-        _init() {
-            super._init(0.0, _('Vaktija'));
-            // Create Panel Icon
-            let gicon = Gio.icon_new_for_string(iconPath);
-            this.add_child(new St.Icon({
-                gicon: gicon,
-                style_class: 'system-status-icon',
-                icon_size: 16
-            }));
+class VaktijaIndicator extends PanelMenu.Button {
+  _init(extension) {
+    super._init(0.0, extension.metadata.name, false);
+    this._ext = extension;
 
-            renderWidgetEntries(this.menu);
-            this.menu.connect("open-state-changed", rerenderWidgetPrayerTimes);
-        }
-    });
+    // Icon
+    const icon = Gio.icon_new_for_string(ICON_PATH);
+    this.add_child(new St.Icon({
+      gicon: icon,
+      style_class: 'system-status-icon',
+      icon_size: 16
+    }));
+
+    this._rerender();
+    this.menu.connect('open-state-changed', () => this._rerender());
+  }
+
+  _rerender() {
+    const ext = this._ext;
+    ext._labels = ext._loadLabels();
+    ext._data   = ext._fetchVaktijaData();
+
+    this.menu.removeAll();
+
+    // Title
+    const clock = ext._today
+      .toLocaleString('bs-Latn-BA',{hour:'2-digit',minute:'2-digit'})
+      .toUpperCase();
+    let text  = `Vaktija - ${ext._settings.get_string('vaktija-eu-city')} | ${clock}`;
+    let style = TITLE_ITEM_STYLE_CLASS;
+    if (ext._data.no1 === "XX:XX") {
+      text  = ext._labels.connectionError;
+      style = CONNECTION_ERROR_TITLE_STYLE_CLASS;
+    }
+    this.menu.addMenuItem(createSecondaryItem(text, style, Clutter.ActorAlign.CENTER));
+
+    // Date
+    this.menu.addMenuItem(createSecondaryItem(ext._generateDateString(), DATE_STYLE_CLASS, Clutter.ActorAlign.CENTER), 2);
+
+    // Separator
+    const sep = new PopupMenu.PopupMenuItem('', { style_class: OUTER_SEPARATOR_STYLE_CLASS, hover:false });
+    sep.setOrnament(PopupMenu.Ornament.HIDDEN);
+    sep.sensitive = false;
+    this.menu.addMenuItem(sep);
+
+    // Prayers + countdown
+    const { index, diff } = ext._findTimeIndex();
+    Object.keys(ext._data)
+      .filter(k => /^no\d+$/.test(k))
+      .sort((a,b)=>parseInt(a.slice(2))-parseInt(b.slice(2)))
+      .forEach((key, idx) => {
+        const name = ext._labels.prayers[idx] ?? key;
+        const t    = ext._data[key].slice(0,-3);
+        const curr = idx===index;
+
+        this.menu.addMenuItem(createPrayerItem(
+          name, t,
+          curr ? CURRENT_PRAYER_ITEM_STYLE_CLASS : DEFAULT_PRAYER_ITEM_STYLE_CLASS
+        ));
+        this.menu.addMenuItem(createSecondaryItem(
+          ext._generateTimePhrase(diff[idx]),
+          curr ? CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS : DEFAULT_SUB_ITEM_STYLE_CLASS
+        ));
+      });
+  }
+});
