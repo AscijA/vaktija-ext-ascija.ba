@@ -2,9 +2,9 @@
   "uuid": "vaktija@ascija.ba",
   "name": "Vaktija",
   "description": "Extension for prayer times",
-  "shell-version": [ "45", "46", "47", "48" ],
+  "shell-version": [ "45", "46", "47", "48", "49" ],
   "prefs": {
-    "shell-version": [ "45", "46", "47", "48" ],
+    "shell-version": [ "45", "46", "47", "48", "49" ],
     "javascript-module": "prefs"
   },
   "settings-schema": "org.gnome.shell.extensions.vaktija",
