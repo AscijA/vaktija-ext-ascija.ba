@@ -77,14 +77,10 @@ export default class VaktijaExtension extends Extension {
   }
 
   _notify(prayerName) {
-    const notification = new Gio.Notification();
-    notification.set_title(_('Upcoming Prayer'));
-    notification.set_body(_(`${prayerName} starts in 15 minutes.`));
-
-    const icon = Gio.icon_new_for_string(ICON_PATH);
-    notification.set_icon(icon);
-
-    this.show_notification(this.metadata.uuid, notification);
+    Main.notify(
+      _('Upcoming Prayer'),
+      _(`${prayerName} starts in 15 minutes.`)
+    );
   }
 
   enable() {
