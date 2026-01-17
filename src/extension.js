@@ -132,13 +132,31 @@ export default class VaktijaExtension extends Extension {
 
   _fetchVaktijaData() {
     const city = this._settings.get_string('vaktija-eu-city').toLowerCase();
-    const session = new Soup.Session();
-    const msg = Soup.Message.new('GET', `https://vaktija.eu/${city}`);
-    const bytes = session.send_and_read(msg, null);
-    const html = new TextDecoder('utf-8').decode(bytes.get_data());
-    this._data = this._extractDailyPrayers(html);
-    return this._data;
+
+    try {
+      const session = new Soup.Session();
+      const msg = Soup.Message.new('GET', `https://vaktija.eu/${city}`);
+
+      const bytes = session.send_and_read(msg, null);
+
+      if (msg.get_status() !== Soup.Status.OK) {
+        return this._data ?? null;
+      }
+
+      const html = new TextDecoder('utf-8').decode(bytes.get_data());
+      const parsed = this._extractDailyPrayers(html);
+
+      if (!parsed) {
+        return this._data ?? null;
+      }
+
+      this._data = parsed;
+      return this._data;
+    } catch (e) {
+      return this._data ?? null;
+    }
   }
+
 
   _extractDailyPrayers(html) {
     try {
