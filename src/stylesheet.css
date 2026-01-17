@@ -42,10 +42,11 @@
   width: 100px;
 }
 
-/* .prayer-time { */
-/* width: 50px;  */
-/* background-color: red; */
-/* } */
+.prayer-time {
+  width: 50px;
+  text-align: right;
+}
+
 /*-----------*/
 
 /* Sub Item */

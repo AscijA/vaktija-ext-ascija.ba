@@ -37,33 +37,61 @@ const DEFAULT_SUB_ITEM_STYLE_CLASS = 'next-prayer';
 const CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS = `current-sub ${DEFAULT_SUB_ITEM_STYLE_CLASS}`;
 
 // helper: create a sub-line menu item
-function createSecondaryItem(text, style = DEFAULT_SUB_ITEM_STYLE_CLASS, align = Clutter.ActorAlign.START) {
-  const item = new PopupMenu.PopupMenuItem('', { style_class: style, hover: false });
-  item.setOrnament(PopupMenu.Ornament.HIDDEN);
-  item.sensitive = false;
-  item.actor.add_child(new St.Label({ text: _(text), x_expand: true, x_align: align }));
+function createSecondaryItem(
+  text,
+  style = DEFAULT_SUB_ITEM_STYLE_CLASS,
+  align = Clutter.ActorAlign.START
+) {
+  const item = new PopupMenu.PopupBaseMenuItem({
+    reactive: false,
+    can_focus: false,
+    hover: false,
+    style_class: style,
+  });
+
+  item.actor.x_expand = true;
+
+  const label = new St.Label({
+    text: _(text),
+    x_expand: true,
+    x_align: align,
+  });
+
+  item.actor.add_child(label);
   return item;
 }
 
-// helper: create a prayer name+time menu item
+// helper: create a prayer name+time menu item 
 function createPrayerItem(name, time, style = DEFAULT_PRAYER_ITEM_STYLE_CLASS) {
-  const item = new PopupMenu.PopupMenuItem('', { style_class: style, hover: false });
-  item.setOrnament(PopupMenu.Ornament.HIDDEN);
-  item.sensitive = false;
-  item.actor.add_child(new St.Label({
+  const item = new PopupMenu.PopupBaseMenuItem({
+    reactive: false,
+    can_focus: false,
+    hover: false,
+    style_class: style,
+  });
+
+  item.actor.x_expand = true;
+
+  const nameLabel = new St.Label({
     style_class: PRAYER_LABEL_STYLE_CLASS,
     text: _(name),
     x_expand: true,
-    x_align: Clutter.ActorAlign.START
-  }));
-  item.actor.add_child(new St.Label({
+    x_align: Clutter.ActorAlign.START,
+  });
+
+  const timeLabel = new St.Label({
     style_class: PRAYER_TIME_STYLE_CLASS,
     text: _(time),
-    x_expand: true,
-    x_align: Clutter.ActorAlign.END
-  }));
+    x_expand: false,
+    x_align: Clutter.ActorAlign.END,
+  });
+
+  item.actor.add_child(nameLabel);
+  item.actor.add_child(timeLabel);
+
   return item;
 }
+
 
 export default class VaktijaExtension extends Extension {
   constructor(metadata) {
