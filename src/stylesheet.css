@@ -31,20 +31,35 @@
   color: #ffffff;
   font-family: "Poppins", sans-serif;
   font-weight: 500;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .current-prayer-item {
   color: #00d841;
   font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .prayer-label {
   width: 100px;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .prayer-time {
   width: 50px;
-  text-align: right;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 /*-----------*/
@@ -56,7 +71,6 @@
   height: 12px;
   font-family: "Poppins", sans-serif;
   font-weight: 500;
-
 }
 
 /* .current-sub {
@@ -66,13 +80,19 @@
 /*----------*/
 
 /* Separator */
+.inner-label {
+  font-size: 0px;
+  height: 0px;
+  padding: 0px;
+  border: #ffffff 0px solid;
+  border-bottom: #ffffff 1px solid;
+}
+
 .outer-separator {
   font-size: 0px;
   height: 0px;
   padding: 0px;
-}
-
-.inner-label {
+  border-radius: 0px;
   border: #ffffff 0px solid;
   border-bottom: #ffffff 2px solid;
 }

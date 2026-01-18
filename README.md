@@ -8,18 +8,14 @@ This program is licensed under the GNU General Public License version 2.0. For m
 
 ## Requirements
 
-- GNOME Shell 42
-
-## Optional
-- [Poppins Font](https://fonts.google.com/specimen/Poppins)
-- GNOME Shell Theme [Qogir-dark](https://www.gnome-look.org/p/1230631/)  
+- GNOME Shell 45
 
   
 ## Installation
 
 1. Clone this repository or download the source code and extract the archive.
 2. Run `./install.sh local-install`
-3. Restart the GNOME Shell by pressing **Alt+F2** and entering `r` in the prompt, then press **Enter**.
+3. Restart the GNOME Shell
 4. Enable the extension using **GNOME Extensions** or by running `gnome-extensions enable vaktija@ascija.ba` in your terminal .
 
 ## Usage
@@ -35,13 +31,17 @@ After installing and enabling the extension, a new icon ![Vaktija icon](assets/v
 Following improvements and features are planned to be implamented in future:
 - [ ] Preferences with following options:
   - [X] All cities provided by [Vaktija.eu](https://vaktija.eu/), ~~currently supports only Graz, Austria~~
-  - [ ] Other cities in Europe
+  - [X] Other cities in Europe
   - [ ] 12/24 time formats, currently only 24 hour format is supported 
   - [ ] Light Theme
   - [X] Add positioning for Background Widget
+  - [X] Notification settings
+  - [ ] Other prayer time providers
+  - [ ] Rules for prayer time JSON format
 - [x] Highlight current prayer time and show remaining time until next Prayer
 - [X] Add Desktop Background Widget
-- [ ] Add Notifications X minutes before the prayer
+- [X] Add Notifications X minutes before the prayer
+- [X] Notifications when the time is up
 - [x] Custom Translations via JSON file
 - [x] Guide for Translation JSON file
 - [x] Install script

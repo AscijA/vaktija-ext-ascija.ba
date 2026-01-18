@@ -29,7 +29,7 @@ const TITLE_ITEM_STYLE_CLASS = 'title';
 const CONNECTION_ERROR_TITLE_STYLE_CLASS = `${TITLE_ITEM_STYLE_CLASS} con-error`;
 const DATE_STYLE_CLASS = 'date-title';
 const OUTER_SEPARATOR_STYLE_CLASS = 'outer-separator';
-const INNER_LABEL_STYLE_CLASS = `inner-label ${OUTER_SEPARATOR_STYLE_CLASS}`;
+const INNER_LABEL_STYLE_CLASS = `inner-label`;
 const DEFAULT_PRAYER_ITEM_STYLE_CLASS = 'default-prayer-item';
 const CURRENT_PRAYER_ITEM_STYLE_CLASS = `current-prayer-item ${DEFAULT_PRAYER_ITEM_STYLE_CLASS}`;
 const PRAYER_LABEL_STYLE_CLASS = 'prayer-label';
@@ -358,10 +358,11 @@ const Indicator = GObject.registerClass(
       this.menu.addMenuItem(createSecondaryItem(ext._generateDateString(), DATE_STYLE_CLASS, Clutter.ActorAlign.CENTER), 2);
 
       // Separator
-      const sep = new PopupMenu.PopupMenuItem('', { style_class: OUTER_SEPARATOR_STYLE_CLASS, hover: false });
-      sep.setOrnament(PopupMenu.Ornament.HIDDEN);
-      sep.sensitive = false;
+      // const sep = new PopupMenu.PopupMenuItem('', { style_class: OUTER_SEPARATOR_STYLE_CLASS, hover: false });
+      const sep = new PopupMenu.PopupSeparatorMenuItem();
+      sep.add_style_class_name(OUTER_SEPARATOR_STYLE_CLASS);
       this.menu.addMenuItem(sep);
+
 
       // Prayers + countdown
       const { index, diff } = ext._findTimeIndex();
@@ -381,6 +382,11 @@ const Indicator = GObject.registerClass(
             ext._generateTimePhrase(diff[idx]),
             curr ? CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS : DEFAULT_SUB_ITEM_STYLE_CLASS
           ));
+          if (idx < 5) {
+            let sepInner = new PopupMenu.PopupSeparatorMenuItem();
+            sepInner.add_style_class_name(INNER_LABEL_STYLE_CLASS);
+            this.menu.addMenuItem(sepInner);
+          }
         });
     }
   });
