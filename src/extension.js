@@ -13,6 +13,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import { Extension, gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
+import GSound from 'gi://GSound';
 
 const GETTEXT_DOMAIN = 'vaktija-extension';
 
@@ -35,6 +36,13 @@ const PRAYER_LABEL_STYLE_CLASS = 'prayer-label';
 const PRAYER_TIME_STYLE_CLASS = 'prayer-time';
 const DEFAULT_SUB_ITEM_STYLE_CLASS = 'next-prayer';
 const CURRENT_SUB_PRAYER_ITEM_STYLE_CLASS = `current-sub ${DEFAULT_SUB_ITEM_STYLE_CLASS}`;
+
+const NotificationType = {
+  NOTIFICATION_UPCOMING: 1,
+  NOTIFICATION_TIME: 2,
+};
+const TEST_NOTIFY_EVERY_MINUTE = false;
+let _testTick = 0;
 
 // helper: create a sub-line menu item
 function createSecondaryItem(
@@ -104,10 +112,14 @@ export default class VaktijaExtension extends Extension {
     this._data = {};
   }
 
-  _notify(prayerName) {
+  _notify(prayerName, type) {
+
+    const title = _('Vaktija');
+    const content = type == NotificationType.NOTIFICATION_UPCOMING ? `${prayerName} je za 15 minuta.` : `Vrijeme je za ${prayerName}.`;
     Main.notify(
-      _('Upcoming Prayer'),
-      _(`${prayerName} starts in 15 minutes.`)
+      title,
+      content,
+
     );
   }
 
@@ -251,9 +263,31 @@ export default class VaktijaExtension extends Extension {
     return beforeAfter === lab.prayerNext ? fmtNext : fmtPrev;
   }
 
+  _playSound() {
+    try {
+      const ctx = new GSound.Context();
+      ctx.init(null);
+
+      ctx.play_simple({ 'event.id': 'message-new-instant' }, null);
+    } catch (e) {
+      logError(e, '[Vaktija] Failed to play sound via GSound');
+    }
+  }
+
   _updateDates() {
     this._today = new Date();
 
+    if (TEST_NOTIFY_EVERY_MINUTE) {
+      _testTick++;
+      const clock = this._today.toLocaleTimeString('bs-Latn-BA', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+
+      this._playSound();
+      Main.notify(_('Vaktija Test'), `Tick #${_testTick} @ ${clock}`);
+    }
     const now = this._today.getTime();
     const fifteenMinsInMs = 15 * 60 * 1000;
 
@@ -264,9 +298,15 @@ export default class VaktijaExtension extends Extension {
       if (diff > 14 * 60 * 1000 && diff <= fifteenMinsInMs) {
         const prayerName = this._labels.prayers[idx];
         if (this._lastNotified !== prayerName) {
-          this._notify(prayerName);
+          this._playSound();
+          this._notify(prayerName, NotificationType.NOTIFICATION_UPCOMING);
           this._lastNotified = prayerName;
         }
+      }
+      else if (diff === 0) {
+        const prayerName = this._labels.prayers[idx];
+        this._playSound();
+        this._notify(prayerName, NotificationType.NOTIFICATION_TIME);
       }
     });
 
